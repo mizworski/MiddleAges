@@ -1,0 +1,158 @@
+/**
+@mainpage Dokumentacja Zadania Średniowiecze
+
+# Średniowiecze
+
+Uwaga: aktualna treść zadania znajduje się w [Moodle'u](https://moodle.mimuw.edu.pl/mod/assignment/view.php?id=18178).
+
+### Opis projektu
+Dużym, trzyczęściowym projektem zaliczeniowym w tym roku jest
+implementacja deterministycznej turowej gry strategicznej z pełną
+wiedzą wraz ze sztuczną inteligencją (AI). Pierwsza część polega na
+zaimplementowaniu i przetestowaniu struktur danych oraz protokołu
+wejścia w programie AI. W drugiej części należy stworzyć nic
+nie robiącą AI oraz skrypt bash łączący program interfejsu graficznego i
+programy AI w symulator rozgrywki AI vs AI, AI vs człowiek lub
+człowiek vs człowiek. W trzeciej i ostatniej części należy
+stworzyć AI potrafiące wygrać przeciwko prostym strategiom.
+
+### Opis gry
+Gra rozgrywa się na kwadratowej planszy `n*n` (`8 < n < 2^31`) i jest
+przeznaczona dla dwóch graczy wykonujących na zmianę swoje tury
+(rozpoczynając od pierwszego gracza). Każdy z graczy kontroluje swoje
+jednostki należące do jednego z trzech typów: król, rycerz, chłop.
+Na początku gry każdy gracz ma 1 króla, 1 chłopa i 2 rycerzy,
+ustawionych jeden obok drugiego w poziomej linii na planszy w
+kolejności król, chłop, rycerz, rycerz. Początkowe ustawienie
+jednostek następuje poprzez wylosowanie pozycji królów
+spośród pierwszych `n-3` kolumn, tak aby królowie byli od siebie
+oddaleni o co najmniej 8 w metryce maksimum.
+
+Podczas każdej tury gracz może ruszyć raz każdą swoją jednostką.
+Ruch składa się z przesunięcia jej o 1 pole pionowo, poziomo, na skos
+lub wykonania akcji (tylko przez chłopa). Gdy jednostka ruszy się na
+pole zajmowane przez inną jednostkę, następuje walka. Gdy walczą ze
+sobą dwie jednostki tego samego typu, obie giną. W przeciwnym wypadku
+rycerz pokonuje króla lub chłopa, a król pokonuje chłopa. Nie można
+ruszyć swojej jednostki na pole zajmowane przez inną swoją jednostkę
+(aczkolwiek można najpierw przesunąć jedną jednostkę, a drugą
+później przesunąć na zwolnione miejsce w tej samej turze).
+Akcją możliwą do wykonania przez chłopa jest wyprodukowanie nowego rycerza
+albo chłopa na jednym z sąsiednich (pionowo, poziomo lub po skosie)
+wolnych pól, pod warunkiem że chłop stał w miejscu, nie wykonując akcji
+przez poprzednie 2 tury. Innymi słowy chłop, który ruszył się w turze
+`k`, a potem się już nie ruszał, może dopiero wyprodukować jednostkę w
+turze `k+3`, następnie `k+6` itd.
+Nowymi jednostkami można się ruszać od razu po wyprodukowaniu (tj.
+gdy zostały wyprodukowane w turze `k`, to traktowane są jakby ostatnio
+wykonały ruch w turze `k-1`).
+Chłop, który od początku gry (tura 1)
+się nie ruszał, może wyprodukować pierwszą jednostkę w turze 3, a każda
+jednostka na początku gry może się od razu ruszyć. 
+
+Gra kończy się w momencie, gdy król jednego z graczy zginie lub po
+`k`-tej (`1 <= k < 2^31`) turze drugiego gracza. Wygrywa gracz
+mający jedynego żywego króla. W przeciwnym wypadku mamy remis.
+
+## Część 1
+Napisz program interpretujący protokół komunikacyjny gracza
+i obsługujący wiadomości dostawane na standardowym wejściu od obu graczy (w tym obie
+wiadomości `INIT`, o czym za chwilę).
+Po każdym ruchu (dokładniej, po każdej wiadomości innej niż `END_TURN`)
+program powinien wypisać na standardowe wyjście tekstową reprezentację górnego
+lewego rogu planszy (górne `10*10` pól, chyba że plansza jest
+mniejsza). 
+Jednostki pierwszego gracza powinny być zaznaczone wielkimi literami `K`, `R`, `C` (odpowiednio król, rycerz, chłop),
+jednostki drugiego gracza małymi literami `k`, `r`, `c`,
+a puste pola kropką. Przykład planszy:
+
+    ..........
+    .KRRC.....
+    ..........
+    ..........
+    ....r.r...
+    .....k....
+    .....c....
+    ..........
+    ..........
+    ..........
+
+Na wyjściu nie powinno być żadnych dodatkowych znaków. 
+Po każdej planszy powinna zostać wypisana pojedyncza pusta linia.
+
+### Protokół komunikacyjny gracza
+Program powinien obsługiwać następujące polecenia:
+* `INIT n k p x1 y1 x2 y2` – informacja o stanie początkowym gry, osobno dla każdego gracza:
+n – wielkość planszy, k – maksymalna liczba tur (na gracza), p – numer
+gracza (1 lub 2), (x1, y1) – początkowe współrzędne
+króla pierwszego gracza, (x2, y2) – początkowe współrzędne króla
+drugiego gracza;
+* `MOVE x1 y1 x2 y2` – ruch jednostką z pozycji (x1, y1) na (x2, y2);
+* `PRODUCE_KNIGHT x1 y1 x2 y2` – wyprodukowanie przez chłopa
+znajdującego się na polu (x1, y1) rycerza na sąsiednie pole (x2, y2);
+* `PRODUCE_PEASANT x1 y1 x2 y2` – wyprodukowanie przez chłopa
+znajdującego się na polu (x1, y1) chłopa na sąsiednie pole (x2, y2);
+* `END_TURN` – informacja o końcu tury obecnie poruszającego się
+gracza.
+
+Każda wiadomość musi być zakończona znakiem nowej linii (`\n`),
+a poszczególne jej argumenty mogą być oddzielone wyłącznie pojedynczymi
+spacjami.
+Na końcu wiadomości nie ma spacji.
+
+Górny lewy róg planszy ma współrzędne (1, 1). Współrzędna `x` to numer kolumny, 
+a współrzędna `y` to numer wiersza.
+
+### Wyjście programu
+Program powinien wykrywać, kiedy gra się zakończyła i wtedy po przeprowadzeniu 
+ostatniego ruchu wypisać na standardowe wyjście diagnostyczne (`stderr`)
+jeden z komunikatów: `player 1 won`, `player 2 won`
+lub `draw` i zakończyć się z kodem 0.
+
+W przypadku otrzymania niepoprawnego wejścia program powinien wypisać na standardowe
+wyjście diagnostyczne `input error` i zakończyć się z kodem błędu 42.
+Żadne poprawne polecenie nie jest dłuższe niż 100 znaków, ale program powinien się
+poprawnie zakończyć nawet w przypadku dowolnie długiej linii (uwaga na `gets` albo `scanf("%s")`).
+
+### Implementacja
+W repozytorium XXX znajduje się wstępna implementacja rozwiązania tego zadania.
+Zadanie to należy oddawać właśnie przez to repozytorium.
+W repozytorium, które pobierzesz, będą znajdowały się następujące pliki:
+* _src/middle_ages.c_ – główny plik programu, w którym wczytujemy dane wejściowe i uruchamiamy silnik gry; plik ten nie powinien znać szczegółów implementacji silnika gry;
+* _src/engine.c_ – plik biblioteki „silnika” gry zawierający wszystkie struktury i funkcje potrzebne do przeprowadzenia rozgrywki;
+* _src/engine.h_ – plik nagłówkowy biblioteki silnika gry;
+* _src/parse.c_ – plik biblioteki wczytującej i parsującej polecenia;
+* _src/parse.h_ – plik nagłówkowy biblioteki wczytującej i parsującej polecenia;
+* _CMakeLists.txt_ – plik konfiguracyjny CMake'a;
+* _Doxyfile.in_ – plik konfiguracyjny Doxygena;
+* _MainPage.dox_ – strona główna dokumentacji Doxygena.
+
+Projekt można zaimportować do CLiona i tam zbudować.
+Można też zbudować go (będąc w katalogu głównym) przy użyciu poleceń:
+
+    mkdir build
+    cd build
+    cmake ..
+
+Po wywołaniu `make` w katalogu _build_ pojawi się wykonywalny plik *middle_ages*.
+Twoim zadaniem jest rozbudowanie tego projektu tak, aby program *middle_ages* reagował
+na polecenia ze standardowego wejścia zgodnie ze specyfikacją opisaną w sekcji
+**Protokół komunikacyjny gracza**.
+Projekt może zawierać inne pliki niż wyżej wymienione,
+a zaproponowane funkcjonalności poszczególnych plików można dalej dzielić na moduły (ale nie łączyć). 
+
+### Dokumentacja Doxygen
+Polecenie `make doc` wywołane w katalogu _build_ generuje dokumentację Doxygena całego projektu na podstawie komentarzy umieszczonych w poszczególnych plikach.
+Twoje rozwiązanie powinno zawierać komentarze Doxygena co najmniej do każdego pliku
+oraz do wszystkich funkcji eksportowanych na zewnątrz pliku, w którym się znajdują.
+
+### Punktacja
+Za w pełni poprawnie rozwiązane zadanie można uzyskać 20 pkt.
+* Za złe działanie programu na planszach większych niż 1000 x 1000 można 
+stracić co najwyżej 8 pkt.
+* Za złe parsowanie niepoprawnych poleceń można stracić co najwyżej 3 pkt.
+* Za wycieki pamięci można stracić co najwyżej 6 pkt.
+* Za błędy związane z dokumentacją Doxygen można stracić co najwyżej 3 pkt.
+* Za zły styl kodowania można stracić co najwyżej 3 pkt.
+
+*/
