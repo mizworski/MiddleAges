@@ -6,8 +6,15 @@
 #ifndef PARSE_H
 #define PARSE_H
 
+#define PARSE_ERROR         -1
+#define INIT                0
+#define MOVE                1
+#define PRODUCE_KNIGHT      2
+#define PRODUCE_PEASANT     3
+#define END_TURN            4
+
 typedef struct def_command {
-    char name[16];
+    int command_id;
     int data[7];
 } command;
 
