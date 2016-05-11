@@ -14,7 +14,7 @@ void start_game();
 /**
  * Frees memory. Needed after finishing game.
  */
-void end_game();
+int end_game();
 
 /**
  * Initializes a game with size of a board, number of rounds and positions of kings.

@@ -1,7 +1,7 @@
- /** @file
-    Interface of parser.
+/** @file
+   Interface of parser.
 
- */
+*/
 
 #ifndef PARSE_H
 #define PARSE_H
@@ -18,10 +18,17 @@ typedef struct def_command {
     int data[7];
 } command;
 
+int getArgumentsFromString(char *bufferedString,
+                           command *newCommand);
+
+int getCommandCode(char *commandString,
+                   size_t *charsShiftInString);
+
+int getReadLineLength(char *lineRead);
 
 /** Reads a command.
   Returns command with data points using 'command' structure.
   */
-command* parse_command();
+command *parse_command();
 
 #endif /* PARSE_H */

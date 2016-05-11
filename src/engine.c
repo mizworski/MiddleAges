@@ -2,8 +2,8 @@ void start_game() {
 
 }
 
-void end_game() {
-
+int end_game() {
+    return -1;
 }
 
 void print_topleft() {

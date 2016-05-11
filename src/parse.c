@@ -21,9 +21,11 @@ int getArgumentsFromString(char *bufferedString,
                            command *newCommand) {
     int argumentCount = 0;
 
-    while (argumentCount < MAX_ARGUMENT_COUNT && *bufferedString != NULL) { // Lazy eval.
+    while (argumentCount < MAX_ARGUMENT_COUNT && *bufferedString != NULL &&
+           *bufferedString != '\n') {
         newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString,
                                                          INTEGER_BASE);
+        printf(" %d", newCommand->data[argumentCount - 1]);
     }
 
     switch (newCommand->command_id) {
@@ -78,19 +80,19 @@ int getCommandCode(char *commandString,
     // Compares lengths of operations defined in specification and operations
     // string itself with first charsShiftInString chars of operationString
     if (*charsShiftInString == INIT_LENGTH &&
-        (strncmp(commandString, "NEW_DISEASE_ENTER_DESCRIPTION", *charsShiftInString) == 0)) {
+        (strncmp(commandString, "INIT", *charsShiftInString) == 0)) {
         commandCode = INIT;
     } else if (*charsShiftInString == MOVE_LENGTH &&
-               (strncmp(commandString, "NEW_DISEASE_COPY_DESCRIPTION", *charsShiftInString) == 0)) {
+               (strncmp(commandString, "MOVE", *charsShiftInString) == 0)) {
         commandCode = MOVE;
     } else if (*charsShiftInString == PRODUCE_KNIGHT_LENGTH &&
-               (strncmp(commandString, "CHANGE_DESCRIPTION", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "PRODUCE_KNIGHT", *charsShiftInString)) == 0) {
         commandCode = PRODUCE_KNIGHT;
     } else if (*charsShiftInString == PRODUCE_PEASANT_LENGTH &&
-               (strncmp(commandString, "PRINT_DESCRIPTION", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "PRODUCE_PEASANT", *charsShiftInString)) == 0) {
         commandCode = PRODUCE_PEASANT;
     } else if (*charsShiftInString == END_TURN_LENGTH &&
-               (strncmp(commandString, "DELETE_PATIENT_DATA", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "END_TURN", *charsShiftInString)) == 0) {
         commandCode = END_TURN;
     } else {
         commandCode = PARSE_ERROR;
@@ -122,10 +124,9 @@ command *parse_command() {
     int readLineLength;
     command *newCommand = malloc(sizeof(command));
     int returnValue = 0;
-
+    // TODO still waiting
     // When function fails to read new line it returns null.
     lineReadArrayPointer = fgets(lineRead, MAX_LINE_SIZE, stdin);
-
     // Allocation of bufferedString
     if (lineReadArrayPointer != NULL) {
         readLineLength = getReadLineLength(lineRead);
@@ -140,6 +141,7 @@ command *parse_command() {
     if (lineReadArrayPointer == NULL) {
         newCommand->command_id = PARSE_ERROR;
     } else {
+        printf("krwa");
         size_t charsShiftInString;
 
         // Gets operation code of available operations.
@@ -158,7 +160,7 @@ command *parse_command() {
     // Frees buffer that is not needed anymore.
     free(bufferedStringInitialPointer);
 
-    if (returnValue == 0) {
+    if (returnValue == PARSE_ERROR) {
         newCommand->command_id = PARSE_ERROR;
     }
 

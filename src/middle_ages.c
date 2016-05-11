@@ -1,6 +1,5 @@
 #include <stdbool.h>
 #include <stdlib.h>
-
 #include "parse.h"
 #include "engine.h"
 
@@ -9,7 +8,6 @@
 
 int main() {
     bool game_over = false;
-
     start_game();
 
     command *new_command;
@@ -19,7 +17,7 @@ int main() {
         int return_value = 0;
         switch (new_command->command_id) {
             case PARSE_ERROR:
-                end_game();
+                return_value = end_game();
                 break;
             case INIT:
                 return_value = init(new_command->data[0], new_command->data[1],
