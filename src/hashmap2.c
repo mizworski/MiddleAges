@@ -2,9 +2,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-#define INITIAL_SIZE (256)
-#define MAX_CHAIN_LENGTH (8)
+#define MAX_CHAIN_LENGTH 64
+#define MAX_CAPACITY 0x7fffffff
 
 /* We need to keep keys and values */
 typedef struct hashmap_element hashmap_element;
@@ -14,10 +15,10 @@ typedef struct hashmap_element {
     hashmap_element *next;
 } hashmap_element;
 
-typedef struct hashmap_node {
+typedef struct hashmap_list {
     unsigned int size;
-    hashmap_element *next;
-} hashmap_node;
+    hashmap_element *element;
+} hashmap_list;
 
 /* A hashmap has some maximum size and current size,
  * as well as the data to hold. */
@@ -25,7 +26,7 @@ typedef struct _hashmap_map {
     unsigned int capacity;
     unsigned int capacityCount;
     unsigned int size;
-    hashmap_node *data;
+    hashmap_list *data;
 } hashmap_map;
 
 static unsigned int tab_capacity_values[] = {
@@ -49,7 +50,7 @@ hashmap_map *hashmap_new() {
     m->capacity = tab_capacity_values[m->capacityCount];
     m->size = 0;
 
-    m->data = malloc(m->capacity * sizeof(hashmap_node));
+    m->data = malloc(m->capacity * sizeof(hashmap_list));
     if (!m->data) goto err;
     for (int i = 0; i < m->capacity; i++) {
         m->data->size = 0;
@@ -101,7 +102,7 @@ unsigned int hashmap_hash(int capacity,
 int hashmap_rehash(hashmap_map *in) {
     int i;
     int old_size;
-    hashmap_node *curr;
+    hashmap_list *curr;
 
     /* Setup the new elements */
     hashmap_map *m = in;
@@ -109,7 +110,7 @@ int hashmap_rehash(hashmap_map *in) {
 
     in->capacityCount++;
     m->capacity = tab_capacity_values[m->capacityCount];
-    hashmap_node *temp = malloc(m->capacity * sizeof(hashmap_node));
+    hashmap_list *temp = malloc(m->capacity * sizeof(hashmap_list));
 
     for (i = 0; i < m->capacity; i++) {
         m->data->size = 0;
@@ -122,7 +123,7 @@ int hashmap_rehash(hashmap_map *in) {
 
     /* Rehash the elements */
     for (i = 0; i < old_size; i++) {
-        hashmap_element *currentElement = curr[i].next;
+        hashmap_element *currentElement = curr[i].element;
         while (currentElement != NULL) {
             hashmap_element *tempElement = currentElement;
             currentElement = currentElement->next;
@@ -136,19 +137,120 @@ int hashmap_rehash(hashmap_map *in) {
     return MAP_OK;
 }
 
-int hashmap_put(hashmap_map *in,
+void list_add(pawn *currentPawn,
+              hashmap_list list) {
+    hashmap_element *currentElement;
+    hashmap_element *newElement = malloc(sizeof(hashmap_element));
+    newElement->currentPawn = currentPawn;
+    newElement->next = NULL;
+
+    if (list.element == NULL) {
+        list.element = newElement;
+    } else {
+        currentElement = list.element;
+        while (currentElement->next != NULL) {
+            currentElement = currentElement->next;
+        }
+        currentElement->next = newElement;
+
+    }
+    list.size++;
+}
+
+int hashmap_put(hashmap_map *m,
                 pawn *currentPawn) {
     int hash;
-    hashmap_map *m;
+    hashmap_list list;
 
     /* Find a place to put our value */
     hash = hashmap_hash(m->capacity, currentPawn->x, currentPawn->y);
 
     /* Set the data */
-    m->data[hash].data = value;
-    m->data[hash].key = key;
-    m->data[hash].in_use = 1;
-    m->size++;
+    list = m->data[hash];
+
+    list_add(currentPawn, list);
+
+    if (list.size > MAX_CHAIN_LENGTH && m->capacity < MAX_CAPACITY) {
+        hashmap_rehash(m);
+    }
 
     return MAP_OK;
+}
+
+bool isValidPawn(pawn *currentPawn,
+                 unsigned int x,
+                 unsigned int y) {
+    return currentPawn != NULL ? currentPawn->x == x ? currentPawn->y == y ? true : false : false :
+           false;
+}
+
+pawn *hashmap_get(hashmap_map *m,
+                  int x,
+                  int y) {
+    int hash;
+    hashmap_list list;
+    hashmap_element *currentElement;
+
+    /* Find data location */
+    hash = hashmap_hash(m->capacity, (unsigned) x, (unsigned) y);
+    list = m->data[hash];
+
+    if (list.element == NULL) {
+        return NULL;
+    } else {
+        currentElement = list.element;
+        while (currentElement->next != NULL && !isValidPawn(currentElement->currentPawn,
+                                                            (unsigned) x,
+                                                            (unsigned) y)) {
+            currentElement = currentElement->next;
+        }
+        if (isValidPawn(currentElement->currentPawn, (unsigned) x, (unsigned) y)) {
+            return currentElement->currentPawn;
+        }
+        return NULL;
+    }
+}
+
+int hashmap_remove(hashmap_map *m,
+                   int x,
+                   int y) {
+    int i;
+    int key;
+
+    /* Find key */
+    key = hashmap_hash(m->capacity, currentPawn->x, currentPawn->y);
+
+    /* Linear probing, if necessary */
+    for (i = 0; i < MAX_CHAIN_LENGTH; i++) {
+
+        int in_use = m->data[key].in_use;
+        if (in_use == 1) {
+            if (strcmp(m->data[key].key, key) == 0) {
+                /* Blank out the fields */
+                m->data[key].in_use = 0;
+                m->data[key].data = NULL;
+                m->data[key].key = NULL;
+
+                /* Reduce the size */
+                m->size--;
+                return MAP_OK;
+            }
+        }
+        key = (key + 1) % m->capacity;
+    }
+
+    /* Data not found */
+    return MAP_MISSING;
+}
+
+/* Deallocate the hashmap */
+void hashmap_free(hashmap_map *m) {
+    free(m->data);
+    free(m);
+}
+
+/* Return the length of the hashmap */
+int hashmap_length(hashmap_map *m) {
+    if (m != NULL) return m->size;
+    else return 0;
 }

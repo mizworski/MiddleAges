@@ -9,14 +9,14 @@
 #include "hashmap.h"
 
 typedef struct gameData {
-    unsigned int playerTurn;
-    unsigned int currentRound;
-    unsigned int mapSize;
-    unsigned int maxRound;
-    unsigned int startingx1;
-    unsigned int startingy1;
-    unsigned int startingx2;
-    unsigned int startingy2;
+    int playerTurn;
+    int currentRound;
+    int mapSize;
+    int maxRound;
+    int startingx1;
+    int startingy1;
+    int startingx2;
+    int startingy2;
     map_t gameMap;
 } gameData;
 
@@ -26,8 +26,6 @@ typedef struct pawn {
     unsigned int lastMove;
     char symbol;
 } pawn;
-
-typedef pawn *pawnPtr;
 
 /**
  * Initializes a game. Needed before first INIT.

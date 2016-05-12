@@ -139,11 +139,11 @@ void freeMap(map_t gameMap) {
 
 }
 
-pawnPtr newPawn(int x,
-                int y,
-                int currentRound,
-                char symbol) {
-    pawnPtr newPawn = malloc(sizeof(pawn));
+pawn *newPawn(int x,
+              int y,
+              int currentRound,
+              char symbol) {
+    pawn *newPawn = malloc(sizeof(pawn));
 
     newPawn->x = x;
     newPawn->y = y;
