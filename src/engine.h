@@ -6,6 +6,29 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "hashmap.h"
+
+typedef struct gameData {
+    unsigned int playerTurn;
+    unsigned int currentRound;
+    unsigned int mapSize;
+    unsigned int maxRound;
+    unsigned int startingx1;
+    unsigned int startingy1;
+    unsigned int startingx2;
+    unsigned int startingy2;
+    map_t gameMap;
+} gameData;
+
+typedef struct pawn {
+    unsigned int x;
+    unsigned int y;
+    unsigned int lastMove;
+    char symbol;
+} pawn;
+
+typedef pawn *pawnPtr;
+
 /**
  * Initializes a game. Needed before first INIT.
  */
@@ -58,3 +81,19 @@ int end_turn();
 void print_topleft();
 
 #endif /* ENGINE_H */
+
+int max(int a,
+        int b);
+
+int distMax(int x1,
+            int y1,
+            int x2,
+            int y2);
+
+bool validInitialization(int n,
+                         int k,
+                         int p,
+                         int x1,
+                         int y1,
+                         int x2,
+                         int y2);
