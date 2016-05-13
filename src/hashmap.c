@@ -78,34 +78,32 @@ unsigned int hashingFunction(int capacity,
                (unsigned int) capacity);
 }
 
-void hashmapRehash(hashmap_map *in) {
+void hashmapRehash(hashmap_map *map) {
     int old_size;
     hashmap_list *curr;
+    old_size = map->capacity;
 
-    /* Setup the new elements */
-    hashmap_map *m = in;
-    old_size = m->capacity;
+    map->capacityCount++;
+    map->capacity = tab_capacity_values[map->capacityCount];
+    hashmap_list *temp = malloc(map->capacity * sizeof(hashmap_list));
 
-    in->capacityCount++;
-    m->capacity = tab_capacity_values[m->capacityCount];
-    hashmap_list *temp = malloc(m->capacity * sizeof(hashmap_list));
-
-    for (int i = 0; i < m->capacity; i++) {
-        m->hashArrayOfLists->size = 0;
-        m->hashArrayOfLists = NULL;
+    for (int i = 0; i < map->capacity; i++) { // TODO tutaj problem segfault 13 test
+        temp[i].size = 0;
+        temp[i].element = NULL;
     }
 
     /* Update the array */
-    curr = m->hashArrayOfLists;
-    m->hashArrayOfLists = temp;
+    curr = map->hashArrayOfLists;
+    map->hashArrayOfLists = temp;
 
     /* Rehash the elements */
     for (int i = 0; i < old_size; i++) {
+        hashmap_element *tempElement;
         hashmap_element *currentElement = curr[i].element;
         while (currentElement != NULL) {
-            hashmap_element *tempElement = currentElement;
+            tempElement = currentElement;
             currentElement = currentElement->next;
-            hashmapPut(in, currentElement->currentPawn);
+            hashmapPut(map, tempElement->currentPawn);
             free(tempElement);
         }
     }

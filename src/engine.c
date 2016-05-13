@@ -249,7 +249,11 @@ int produceUnit(int x1,
         return ERROR;
     }
 
-    pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, x2);
+    pawn *currentPawn = hashmapGet(currentGame.gameMap, x1, x2);
+
+    if (currentPawn == NULL) {
+        return ERROR;
+    }
 
     if (currentPawn->lastMove > currentGame.currentRound - 2) {
         return ERROR;
