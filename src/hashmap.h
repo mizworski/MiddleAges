@@ -90,7 +90,7 @@ pawn *hashmapGet(hashmap_map *m,
                  int x,
                  int y);
 
-        int getPawnId(pawn *currentPawn);
+int getPawnId(pawn *currentPawn);
 
 char getPawnSymbol(pawn *currentPawn);
 

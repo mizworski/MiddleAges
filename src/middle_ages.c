@@ -6,10 +6,10 @@
 
 #define ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE     42
 
-#define PLAYER_A_WON_MESSAGE    "player 1 won"
-#define PLAYER_B_WON_MESSAGE    "player 2 won"
-#define INPUT_ERROR_MESSAGE     "input error"
-#define DRAW_MESSAGE            "draw"
+#define PLAYER_A_WON_MESSAGE    "player 1 won\n"
+#define PLAYER_B_WON_MESSAGE    "player 2 won\n"
+#define INPUT_ERROR_MESSAGE     "input error\n"
+#define DRAW_MESSAGE            "draw\n"
 
 int main() {
     bool gameOver = false;
@@ -75,7 +75,9 @@ int main() {
                     PLAYER_B_WON_MESSAGE);
         }
 
-        printTopLeft();
+        if (returnValue != END_TURN_RETURN_VALUE) {
+            printTopLeft();
+        }
     }
 
     endGame();

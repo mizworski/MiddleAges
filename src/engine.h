@@ -8,15 +8,16 @@
 
 #include "hashmap.h"
 
-#define ERROR           -1
-#define GAME_OK         0
-#define PLAYER_A_WON    1
-#define PLAYER_B_WON    2
-#define DRAW            3
+#define END_TURN_RETURN_VALUE   -2
+#define ERROR                   -1
+#define GAME_OK                 0
+#define PLAYER_A_WON            1
+#define PLAYER_B_WON            2
+#define DRAW                    3
 
 typedef struct gameData {
     int playerTurn;
-    int currentRound;
+    unsigned int currentRound;
     int mapSize;
     int maxRound;
     int startingx1;
@@ -108,13 +109,6 @@ bool validInitialization(int n,
                          int x2,
                          int y2);
 
-
-bool isValidOperation(gameData *currentGame,
-                      int x1,
-                      int y1,
-                      int x2,
-                      int y2,
-                      int operationType);
 
 int getPawnAdherence(pawn *currentPawn);
 

@@ -16,7 +16,7 @@ failures=0
         diff -q "${input%.*}.out" temp_stdout.out 1>/dev/null
         if [[ $? == "0" ]]
         then
-            echo "STANDARD   OUT: SUCCESS"
+            continue #echo "STANDARD   OUT: SUCCESS"
         else
             echo "STANDARD   OUT: FAILURE"
             ((failures++))
@@ -24,7 +24,7 @@ failures=0
         diff -q "${input%.*}.err" temp_stderr.out 1>/dev/null
         if [[ $? == "0" ]]
         then
-            echo "DIAGNOSTIC OUT: SUCCESS"
+            continue #echo "DIAGNOSTIC OUT: SUCCESS"
         else
             echo "DIAGNOSTIC OUT: FAILURE"
             ((failures++))

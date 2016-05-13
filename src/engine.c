@@ -45,8 +45,8 @@ void endGame() {
 }
 
 void printTopLeft() {
-    for (int y = 1; y <= currentGame.mapSize; y++) {
-        for (int x = 1; x <= currentGame.mapSize; x++) {
+    for (int y = 1; y <= currentGame.mapSize && y <= 10; y++) {
+        for (int x = 1; x <= currentGame.mapSize && x <= 10; x++) {
             printf("%c", getPawnSymbol(hashmapGet(currentGame.gameMap, x, y)));
         }
         printf("\n");
@@ -73,20 +73,20 @@ int init(int n,
         currentGame.startingy2 = y2;
         currentGame.playerAinit = true;
 
-        pawn *kingA = newPawn(x1, y1, currentGame.currentRound, KING_PLAYER_A_ID);
-        pawn *peasantA = newPawn(x1 + 1, y1, currentGame.currentRound, PEASANT_PLAYER_A_ID);
-        pawn *knight1A = newPawn(x1 + 2, y1, currentGame.currentRound, KNIGHT_PLAYER_A_ID);
-        pawn *knight2A = newPawn(x1 + 3, y1, currentGame.currentRound, KNIGHT_PLAYER_A_ID);
+        pawn *kingA = newPawn(x1, y1, currentGame.currentRound - 1, KING_PLAYER_A_ID);
+        pawn *peasantA = newPawn(x1 + 1, y1, currentGame.currentRound - 1, PEASANT_PLAYER_A_ID);
+        pawn *knight1A = newPawn(x1 + 2, y1, currentGame.currentRound - 1, KNIGHT_PLAYER_A_ID);
+        pawn *knight2A = newPawn(x1 + 3, y1, currentGame.currentRound - 1, KNIGHT_PLAYER_A_ID);
 
         hashmapPut(currentGame.gameMap, kingA);
         hashmapPut(currentGame.gameMap, peasantA);
         hashmapPut(currentGame.gameMap, knight1A);
         hashmapPut(currentGame.gameMap, knight2A);
 
-        pawn *kingB = newPawn(x2, y2, currentGame.currentRound, KING_PLAYER_B_ID);
-        pawn *peasantB = newPawn(x2 + 1, y2, currentGame.currentRound, PEASANT_PLAYER_B_ID);
-        pawn *knight1B = newPawn(x2 + 2, y2, currentGame.currentRound, KNIGHT_PLAYER_B_ID);
-        pawn *knight2B = newPawn(x2 + 3, y2, currentGame.currentRound, KNIGHT_PLAYER_B_ID);
+        pawn *kingB = newPawn(x2, y2, currentGame.currentRound - 1, KING_PLAYER_B_ID);
+        pawn *peasantB = newPawn(x2 + 1, y2, currentGame.currentRound - 1, PEASANT_PLAYER_B_ID);
+        pawn *knight1B = newPawn(x2 + 2, y2, currentGame.currentRound - 1, KNIGHT_PLAYER_B_ID);
+        pawn *knight2B = newPawn(x2 + 3, y2, currentGame.currentRound - 1, KNIGHT_PLAYER_B_ID);
 
         hashmapPut(currentGame.gameMap, kingB);
         hashmapPut(currentGame.gameMap, peasantB);
@@ -108,10 +108,16 @@ int move(int x1,
     if (!isValidField(currentGame.mapSize, x1, y1) ||
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
-
     }
 
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
+
+    if (currentPawn->lastMove >= currentGame.currentRound) {
+        return ERROR;
+    }
+
+    currentPawn->lastMove = currentGame.currentRound;
+
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
     if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn) ||
@@ -225,6 +231,10 @@ int produceUnit(int x1,
 
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, x2);
 
+    if (currentPawn->lastMove > currentGame.currentRound - 2) {
+        return ERROR;
+    }
+
     if (currentGame.playerTurn != getPawnAdherence(currentPawn)) {
         return ERROR;
     }
@@ -233,12 +243,13 @@ int produceUnit(int x1,
         getPawnId(currentPawn) == PEASANT_PLAYER_B_ID) {
         if (getPawnId(currentPawn) == EMPTY_SPACE_ID) {
             pawn *createdPawn;
+            currentPawn->lastMove = currentGame.currentRound;
             if (unitId == PEASANT_PRODUCE_ID) {
-                createdPawn = newPawn(x2, y2, currentGame.currentRound,
+                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1,
                                       (currentGame.currentRound == PLAYER_A_TURN) ?
                                       PEASANT_PLAYER_A_ID : PEASANT_PLAYER_B_ID);
             } else if (unitId == KNIGHT_PRODUCE_ID) {
-                createdPawn = newPawn(x2, y2, currentGame.currentRound,
+                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1,
                                       (currentGame.currentRound == PLAYER_A_TURN) ?
                                       KNIGHT_PLAYER_A_ID : KNIGHT_PLAYER_B_ID);
             } else {
@@ -267,7 +278,7 @@ int endTurn() {
         return DRAW;
     }
 
-    return GAME_OK;
+    return END_TURN_RETURN_VALUE;
 }
 
 int max(int a,
@@ -322,7 +333,7 @@ bool validInitialization(int n,
     if (currentGame.startingy2 != DEFAULT_INITIAL_VALUE && y2 != currentGame.startingy2) {
         isValid = false;
     }
-    if (x1 < 1 || x1 > n || y1 < 1 || y1 > n || x2 < 1 || x2 > n || y2 < 1 || y2 > n) {
+    if (x1 < 1 || x1 > n - 3 || y1 < 1 || y1 > n || x2 < 1 || x2 > n - 3 || y2 < 1 || y2 > n) {
         isValid = false;
     }
     if (distMax(x1, y1, x2, y2) < 8) {
