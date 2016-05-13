@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include "parse.h"
 
 #define MAX_LINE_SIZE               102
@@ -20,12 +21,18 @@
 int getArgumentsFromString(char *bufferedString,
                            command *newCommand) {
     int argumentCount = 0;
-
+    char lastDigit = '\0';
     while (argumentCount < MAX_ARGUMENT_COUNT && bufferedString != NULL &&
-           *bufferedString != '\n' && *bufferedString != '\0') {
+           *bufferedString != '\n' && *bufferedString != '\0' && isdigit(*bufferedString)) {
         newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString,
                                                          INTEGER_BASE);
+        lastDigit = *bufferedString;
+        bufferedString++;
         //printf(" %d", newCommand->data[argumentCount - 1]); // debug
+    }
+
+    if (lastDigit != '\n' && lastDigit != '\0') {
+        return PARSE_ERROR;
     }
 
     switch (newCommand->commandId) {
@@ -80,19 +87,19 @@ int getCommandCode(char *commandString,
     // Compares lengths of operations defined in specification and operations
     // string itself with first charsShiftInString chars of operationString
     if (*charsShiftInString == INIT_LENGTH &&
-        (strncmp(commandString, "INIT", *charsShiftInString) == 0)) {
+        (strncmp(commandString, "INIT", (size_t) *charsShiftInString) == 0)) {
         commandCode = INIT;
     } else if (*charsShiftInString == MOVE_LENGTH &&
-               (strncmp(commandString, "MOVE", *charsShiftInString) == 0)) {
+               (strncmp(commandString, "MOVE", (size_t) *charsShiftInString) == 0)) {
         commandCode = MOVE;
     } else if (*charsShiftInString == PRODUCE_KNIGHT_LENGTH &&
-               (strncmp(commandString, "PRODUCE_KNIGHT", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "PRODUCE_KNIGHT", (size_t) *charsShiftInString)) == 0) {
         commandCode = PRODUCE_KNIGHT;
     } else if (*charsShiftInString == PRODUCE_PEASANT_LENGTH &&
-               (strncmp(commandString, "PRODUCE_PEASANT", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "PRODUCE_PEASANT", (size_t) *charsShiftInString)) == 0) {
         commandCode = PRODUCE_PEASANT;
     } else if (*charsShiftInString == END_TURN_LENGTH &&
-               (strncmp(commandString, "END_TURN", *charsShiftInString)) == 0) {
+               (strncmp(commandString, "END_TURN", (size_t) *charsShiftInString)) == 0) {
         commandCode = END_TURN;
     } else {
         commandCode = PARSE_ERROR;
@@ -121,8 +128,9 @@ command *parseCommand() {
     char *bufferedString = NULL;
     // Pointer needed to free firstly allocated bufferedString.
     char *bufferedStringInitialPointer = bufferedString;
-    int readLineLength;
+    int readLineLength = 0;
     command *newCommand = malloc(sizeof(command));
+    newCommand->commandId = 0;
     int returnValue = 0;
     // TODO still waiting
     // When function fails to read new line it returns null.
@@ -140,7 +148,7 @@ command *parseCommand() {
 
     if (lineReadArrayPointer == NULL) {
         newCommand->commandId = PARSE_ERROR;
-    } else {
+    } else if (newCommand->commandId != PARSE_ERROR) {
         int charsShiftInString;
 
         // Gets operation code of available operations.

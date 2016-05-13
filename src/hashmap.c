@@ -216,22 +216,6 @@ pawn *hashmapGet(hashmap_map *m,
     }
 }
 
-/*void hashmapRemove(hashmap_map *m,
-                   int x,
-                   int y) {
-    x--;
-    y--;
-
-    int hash;
-    hashmap_list list;
-
-    *//* Find key *//*
-    hash = hashingFunction(m->capacity, (unsigned int) x, (unsigned int) y);
-    list = m->hashArrayOfLists[hash];
-
-    listRemove(x, y, list);
-}*/
-
 /* Return the length of the hashmap */
 int hashmapLength(hashmap_map *m) {
     return m == NULL ? 0 : m->size;

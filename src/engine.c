@@ -13,7 +13,7 @@
 #define ATTACKER_KILLED_KING    4
 #define DEFENDER_KILLED_KING    5
 
-#define NONE_POSESSION           0
+#define NONE_POSESSION          0
 #define BELONGS_TO_A            1
 #define BELONGS_TO_B            2
 
@@ -111,6 +111,10 @@ int move(int x1,
     }
 
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
+
+    if (currentPawn == NULL) {
+        return ERROR;
+    }
 
     if (currentPawn->lastMove >= currentGame.currentRound) {
         return ERROR;
@@ -226,8 +230,6 @@ int produceUnit(int x1,
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
     }
-
-    // TODO check if pawn has not moved for last 3 rounds.
 
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, x2);
 
