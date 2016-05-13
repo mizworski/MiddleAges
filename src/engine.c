@@ -108,6 +108,7 @@ int move(int x1,
     if (!isValidField(currentGame.mapSize, x1, y1) ||
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
+
     }
 
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
