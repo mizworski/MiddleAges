@@ -105,9 +105,11 @@ int move(int x1,
          int y1,
          int x2,
          int y2) {
-    //if (!isValidOperation(currentGame, x1, x2, y1, y2, MOVE)) {
-    //    return ERROR;
-    //}
+    if (!isValidField(currentGame.mapSize, x1, y1) ||
+        !isValidField(currentGame.mapSize, x2, y2)) {
+        return ERROR;
+    }
+
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
@@ -121,9 +123,13 @@ int move(int x1,
         int actionResult = performAction(currentPawn, targetPawn);
         switch (actionResult) {
             case UNIT_MOVED:
+                currentPawn->x = (unsigned int) x2 - 1;
+                currentPawn->y = (unsigned int) y2 - 1;
                 hashmapPut(currentGame.gameMap, currentPawn);
                 break;
             case ATTACKER_KILLED:
+                currentPawn->x = (unsigned int) x2 - 1;
+                currentPawn->y = (unsigned int) y2 - 1;
                 hashmapPut(currentGame.gameMap, currentPawn);
                 free(targetPawn);
                 break;

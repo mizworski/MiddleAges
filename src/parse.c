@@ -22,7 +22,7 @@ int getArgumentsFromString(char *bufferedString,
     int argumentCount = 0;
 
     while (argumentCount < MAX_ARGUMENT_COUNT && bufferedString != NULL &&
-           *bufferedString != '\n') {
+           *bufferedString != '\n' && *bufferedString != '\0') {
         newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString,
                                                          INTEGER_BASE);
         //printf(" %d", newCommand->data[argumentCount - 1]); // debug

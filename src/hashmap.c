@@ -135,7 +135,7 @@ pawn *hashmapRemove(hashmap_map *m,
                     int x,
                     int y) {
     int hash;
-    hashmap_list list;
+    hashmap_list *list;
     hashmap_element *currentElement;
     hashmap_element *previousElement;
 
@@ -144,12 +144,12 @@ pawn *hashmapRemove(hashmap_map *m,
 
     /* Find hashArrayOfLists location */
     hash = hashingFunction(m->capacity, (unsigned int) x, (unsigned int) y);
-    list = m->hashArrayOfLists[hash];
+    list = &m->hashArrayOfLists[hash];
 
-    if (list.element == NULL) {
+    if (list->element == NULL) {
         return NULL;
     } else {
-        currentElement = list.element;
+        currentElement = list->element;
         previousElement = NULL;
         while (currentElement->next != NULL && !isValidPawn(currentElement->currentPawn,
                                                             (unsigned int) x,
@@ -161,14 +161,15 @@ pawn *hashmapRemove(hashmap_map *m,
             return NULL;
         } else {
             if (isValidPawn(currentElement->currentPawn, (unsigned int) x, (unsigned int) y)) {
+                pawn *currentPawn = currentElement->currentPawn;
                 if (previousElement == NULL) {
-                    list.element = currentElement->next;
+                    list->element = currentElement->next;
                 } else {
-                    pawn *currentPawn = currentElement->currentPawn;
                     previousElement->next = currentElement->next;
-                    free(currentElement);
-                    return currentPawn;
+
                 }
+                free(currentElement);
+                return currentPawn;
             } else {
                 return NULL;
             }
