@@ -110,6 +110,15 @@ int move(int x1,
         return ERROR;
     }
 
+    if (currentGame.playerAinit == false ||
+        currentGame.playerBinit == false) {
+        return ERROR;
+    }
+
+    if (distMax(x1,y1,x2,y2) != 1) {
+        return ERROR;
+    }
+
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
 
     if (currentPawn == NULL) {
@@ -231,6 +240,15 @@ int produceUnit(int x1,
         return ERROR;
     }
 
+    if (currentGame.playerAinit == false ||
+        currentGame.playerBinit == false) {
+        return ERROR;
+    }
+
+    if (distMax(x1,y1,x2,y2) != 1) {
+        return ERROR;
+    }
+
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, x2);
 
     if (currentPawn->lastMove > currentGame.currentRound - 2) {
@@ -268,6 +286,11 @@ int produceUnit(int x1,
 }
 
 int endTurn() {
+    if (currentGame.playerAinit == false ||
+        currentGame.playerBinit == false) {
+        return ERROR;
+    }
+
     if (currentGame.playerTurn == PLAYER_A_TURN) {
         currentGame.playerTurn = PLAYER_B_TURN;
     } else {
@@ -295,6 +318,10 @@ int distMax(int x1,
     return max(abs(x1 - x2), abs(y1 - y2));
 }
 
+bool isCloseEnough(pawn *from, pawn *to) {
+    return distMax(from->x, from->y, to->x, to->y) == 1;
+}
+
 bool isValidField(int mapSize,
                   int x,
                   int y) {
@@ -319,7 +346,6 @@ bool validInitialization(int n,
     if (currentGame.mapSize != DEFAULT_INITIAL_VALUE && n != currentGame.mapSize) {
         isValid = false;
     }
-
     if (currentGame.maxRound != DEFAULT_INITIAL_VALUE && k != currentGame.maxRound) {
         isValid = false;
     }
@@ -341,7 +367,10 @@ bool validInitialization(int n,
     if (distMax(x1, y1, x2, y2) < 8) {
         isValid = false;
     }
-    if (n <= 8 || n >= pow(2, 31)) {
+    if (n <= 8 || n >= pow(2, 31)) { // TODO change to static
+        isValid = false;
+    }
+    if (k < 1 || n >= pow(2, 31)) {
         isValid = false;
     }
     if (p != 1 && p != 2) {

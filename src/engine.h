@@ -97,6 +97,8 @@ int distMax(int x1,
             int x2,
             int y2);
 
+bool isCloseEnough(pawn *from, pawn *to);
+
 bool isValidField(int mapSize,
                   int x,
                   int y);
