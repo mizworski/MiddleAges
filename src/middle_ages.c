@@ -1,65 +1,84 @@
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "parse.h"
 #include "engine.h"
 
-#define GAME_OVER                                   1
 #define ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE     42
 
+#define PLAYER_A_WON_MESSAGE    "player 1 won"
+#define PLAYER_B_WON_MESSAGE    "player 2 won"
+#define INPUT_ERROR_MESSAGE     "input error"
+#define DRAW_MESSAGE            "draw"
+
 int main() {
-    bool game_over = false;
-    start_game();
+    bool gameOver = false;
+    startGame();
 
-    command *new_command;
+    command *newCommand;
 
-    while (!game_over) {
-        new_command = parse_command();
-        int return_value = 0;
-        switch (new_command->command_id) {
+    while (!gameOver) {
+        newCommand = parseCommand();
+        int returnValue = 0;
+        switch (newCommand->commandId) {
             case PARSE_ERROR:
-                return_value = end_game();
+                returnValue = ERROR;
                 break;
             case INIT:
-                return_value = init(new_command->data[0], new_command->data[1],
-                                    new_command->data[2], new_command->data[3],
-                                    new_command->data[4], new_command->data[5],
-                                    new_command->data[6]);
+                returnValue = init(newCommand->data[0], newCommand->data[1],
+                                   newCommand->data[2], newCommand->data[3],
+                                   newCommand->data[4], newCommand->data[5],
+                                   newCommand->data[6]);
                 break;
             case MOVE:
-                return_value = move(new_command->data[0], new_command->data[1],
-                                    new_command->data[2], new_command->data[3]);
+                returnValue = move(newCommand->data[0], newCommand->data[1],
+                                   newCommand->data[2], newCommand->data[3]);
                 break;
             case PRODUCE_KNIGHT:
-                return_value = produce_knight(new_command->data[0], new_command->data[1],
-                                              new_command->data[2], new_command->data[3]);
+                returnValue = produceKnight(newCommand->data[0], newCommand->data[1],
+                                            newCommand->data[2], newCommand->data[3]);
                 break;
             case PRODUCE_PEASANT:
-                return_value = produce_peasant(new_command->data[0], new_command->data[1],
-                                               new_command->data[2], new_command->data[3]);
+                returnValue = producePeasant(newCommand->data[0], newCommand->data[1],
+                                             newCommand->data[2], newCommand->data[3]);
                 break;
             case END_TURN:
-                return_value = end_turn();
+                returnValue = endTurn();
                 break;
             default:
-                return_value = PARSE_ERROR;
-                break;
+                returnValue = ERROR;
         }
 
-        free(new_command);
+        free(newCommand);
 
-        if (return_value == PARSE_ERROR) {
-            end_game();
+        if (returnValue == ERROR) {
+            endGame();
+            fprintf(stderr,
+                    INPUT_ERROR_MESSAGE);
             return ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE;
         }
 
-        if (return_value == GAME_OVER) {
-            game_over = true;
+        if (returnValue == DRAW) {
+            gameOver = true;
+            fprintf(stderr,
+                    DRAW_MESSAGE);
         }
 
-        print_topleft();
+        if (returnValue == PLAYER_A_WON) {
+            gameOver = true;
+            fprintf(stderr,
+                    PLAYER_A_WON_MESSAGE);
+        }
+        if (returnValue == PLAYER_B_WON) {
+            gameOver = true;
+            fprintf(stderr,
+                    PLAYER_B_WON_MESSAGE);
+        }
+
+        printTopLeft();
     }
 
-    end_game();
+    endGame();
 
     return 0;
 }

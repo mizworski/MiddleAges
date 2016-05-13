@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(middle_ages C)
 
 # deklarujemy opcję DEBUG, domyślnie wyłączoną (opcję można włączyć przez argument -DDEBUG=ON)
-option (DEBUG OFF)
+#option (DEBUG OFF)
 
 # jeśli DEBUG == ON, ustawiamy zmienną specyfikującą typ kompilacji na wartość DEBUG, wpp. na release
 #if (DEBUG)
@@ -20,7 +20,7 @@ set(SOURCE_FILES
         src/engine.h
         src/middle_ages.c
         src/parse.c
-        src/parse.h src/hashmap.c src/hashmap.h src/hashmap2.c)
+        src/parse.h src/hashmap.h src/hashmap.c)
 
 add_executable(middle_ages ${SOURCE_FILES})
 

@@ -14,7 +14,7 @@
 #define END_TURN            4
 
 typedef struct def_command {
-    int command_id;
+    int commandId;
     int data[7];
 } command;
 
@@ -22,13 +22,13 @@ int getArgumentsFromString(char *bufferedString,
                            command *newCommand);
 
 int getCommandCode(char *commandString,
-                   size_t *charsShiftInString);
+                   int *charsShiftInString);
 
 int getReadLineLength(char *lineRead);
 
 /** Reads a command.
-  Returns command with data points using 'command' structure.
+  Returns command with hashArrayOfLists points using 'command' structure.
   */
-command *parse_command();
+command *parseCommand();
 
 #endif /* PARSE_H */

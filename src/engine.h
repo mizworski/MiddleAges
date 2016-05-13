@@ -8,6 +8,12 @@
 
 #include "hashmap.h"
 
+#define ERROR           -1
+#define GAME_OK         0
+#define PLAYER_A_WON    1
+#define PLAYER_B_WON    2
+#define DRAW            3
+
 typedef struct gameData {
     int playerTurn;
     int currentRound;
@@ -17,25 +23,20 @@ typedef struct gameData {
     int startingy1;
     int startingx2;
     int startingy2;
-    map_t gameMap;
+    hashmap_map *gameMap;
+    bool playerAinit;
+    bool playerBinit;
 } gameData;
-
-typedef struct pawn {
-    unsigned int x;
-    unsigned int y;
-    unsigned int lastMove;
-    char symbol;
-} pawn;
 
 /**
  * Initializes a game. Needed before first INIT.
  */
-void start_game();
+void startGame();
 
 /**
  * Frees memory. Needed after finishing game.
  */
-int end_game();
+void endGame();
 
 /**
  * Initializes a game with size of a board, number of rounds and positions of kings.
@@ -61,24 +62,31 @@ int move(int x1,
          int x2,
          int y2);
 
-int produce_knight(int x1,
+int performAction(pawn *currentPawn,
+                  pawn *targetPawn);
+
+int produceKnight(int x1,
+                  int y1,
+                  int x2,
+                  int y2);
+
+int producePeasant(int x1,
                    int y1,
                    int x2,
                    int y2);
 
-int produce_peasant(int x1,
-                    int y1,
-                    int x2,
-                    int y2);
+int produceUnit(int x1,
+                int y1,
+                int x2,
+                int y2,
+                int unitId);
 
-int end_turn();
+int endTurn();
 
 /**
  * Prints (into stdout) top-left corner of the board of size m x m where m = min(n,10).
  */
-void print_topleft();
-
-#endif /* ENGINE_H */
+void printTopLeft();
 
 int max(int a,
         int b);
@@ -88,6 +96,10 @@ int distMax(int x1,
             int x2,
             int y2);
 
+bool isValidField(int mapSize,
+                  int x,
+                  int y);
+
 bool validInitialization(int n,
                          int k,
                          int p,
@@ -95,3 +107,16 @@ bool validInitialization(int n,
                          int y1,
                          int x2,
                          int y2);
+
+
+bool isValidOperation(gameData *currentGame,
+                      int x1,
+                      int y1,
+                      int x2,
+                      int y2,
+                      int operationType);
+
+int getPawnAdherence(pawn *currentPawn);
+
+
+#endif /* ENGINE_H */

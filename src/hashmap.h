@@ -1,94 +1,117 @@
-/*
- * Generic hashmap manipulation functions
- *
- * Originally by Elliot C Back - http://elliottback.com/wp/hashmap-implementation-in-c/
- *
- * Modified by Pete Warden to fix a serious performance problem, support strings as keys
- * and removed thread synchronization - http://petewarden.typepad.com
- */
-#ifndef __HASHMAP_H__
-#define __HASHMAP_H__
+/** @file
+   Interface of data structure.
 
-#include "engine.h"
-
-#define KEY_MAX_LENGTH  25
-#define MAP_MISSING     -3      /* No such element */
-#define MAP_FULL        -2      /* Hashmap is full */
-#define MAP_OMEM        -1      /* Out of Memory */
-#define MAP_OK          0       /* OK */
-
-/*
- * any_t is a pointer.  This allows you to put arbitrary structures in
- * the hashmap.
- */
-typedef void *any_t;
-
-/*
- * PFany is a pointer to a function that can take two any_t arguments
- * and return an integer. Returns status code..
- */
-typedef int (*PFany)(pawnPtr,
-                     pawnPtr);
-
-/*
- * map_t is a pointer to an internally maintained data structure.
- * Clients of this package do not need to know how hashmaps are
- * represented.  They see and manipulate only map_t's.
- */
-typedef any_t map_t;
-
-/*
- * Return an empty hashmap. Returns NULL if empty.
 */
-extern hashmap_map *hashmap_new();
+
+#ifndef HASHMAP_H
+#define HASHMAP_H
+
+#include <stdbool.h>
+
+#define KING_PLAYER_A_ID        0
+#define KNIGHT_PLAYER_A_ID      1
+#define PEASANT_PLAYER_A_ID     2
+#define KING_PLAYER_B_ID        10
+#define KNIGHT_PLAYER_B_ID      11
+#define PEASANT_PLAYER_B_ID     12
+#define EMPTY_SPACE_ID          20
+
+#define KING_PLAYER_A_CHAR      'K'
+#define KNIGHT_PLAYER_A_CHAR    'R'
+#define PEASANT_PLAYER_A_CHAR   'C'
+#define KING_PLAYER_B_CHAR      'k'
+#define KNIGHT_PLAYER_B_CHAR    'r'
+#define PEASANT_PLAYER_B_CHAR   'c'
+#define EMPTY_SPACE_CHAR        '.'
+
+typedef struct hashmap_map hashmap_map;
+typedef struct hashmap_list hashmap_list;
+typedef struct hashmap_element hashmap_element;
+typedef struct pawn pawn;
+
+/* A hashmap has some maximum size and current size,
+ * as well as the hashArrayOfLists to hold. */
+struct hashmap_map {
+    unsigned int capacity;
+    unsigned int capacityCount;
+    unsigned int size;
+    hashmap_list *hashArrayOfLists;
+};
+
+struct hashmap_list {
+    unsigned int size;
+    hashmap_element *element;
+};
+
+struct hashmap_element {
+    pawn *currentPawn;
+    hashmap_element *next;
+};
+
+struct pawn {
+    unsigned int x;
+    unsigned int y;
+    unsigned int lastMove;
+    int id;
+};
 
 /*
- * Iteratively call f with argument (item, data) for
- * each element data in the hashmap. The function must
- * return a map status code. If it returns anything other
- * than MAP_OK the traversal is terminated. f must
- * not reenter any hashmap functions, or deadlock may arise.
+ * Return an empty hashmap, or NULL on failure.
  */
-extern int hashmap_iterate(map_t in,
-                           PFany f,
-                           pawnPtr item);
+hashmap_map *hashmapCreate();
 
-/*
- * Add an element to the hashmap. Return MAP_OK or MAP_OMEM.
- */
-extern int hashmap_put(map_t in,
-                       char *key,
-                       pawnPtr value);
+unsigned int hashingFunction1(int capacity,
+                              unsigned int key);
 
-/*
- * Get an element from the hashmap. Return MAP_OK or MAP_MISSING.
- */
-extern int hashmap_get(map_t in,
-                       char *key,
-                       pawnPtr *arg);
+unsigned int hashingFunction2(int capacity,
+                              unsigned int key);
 
-/*
- * Remove an element from the hashmap. Return MAP_OK or MAP_MISSING.
- */
-extern int hashmap_remove(map_t in,
-                          char *key);
+unsigned int hashingFunction(int capacity,
+                             unsigned int x,
+                             unsigned int y);
 
-/*
- * Get any element. Return MAP_OK or MAP_MISSING.
- * remove - should the element be removed from the hashmap
- */
-extern int hashmap_get_one(map_t in,
-                           pawnPtr *arg,
-                           int remove);
+void hashmapRehash(hashmap_map *in);
 
-/*
- * Free the hashmap
- */
-extern void hashmap_free(map_t in);
+void listAdd(pawn *currentPawn,
+             hashmap_list *list);
 
-/*
- * Get the current size of a hashmap
- */
-extern int hashmap_length(map_t in);
+void hashmapPut(hashmap_map *m,
+                pawn *currentPawn);
 
-#endif __HASHMAP_H__
+bool isValidPawn(pawn *currentPawn,
+                 unsigned int x,
+                 unsigned int y);
+
+pawn *hashmapRemove(hashmap_map *m,
+                    int x,
+                    int y);
+
+pawn *hashmapGet(hashmap_map *m,
+                 int x,
+                 int y);
+
+        int getPawnId(pawn *currentPawn);
+
+char getPawnSymbol(pawn *currentPawn);
+
+void listRemove(int x,
+                int y,
+                hashmap_list list);
+
+/*void hashmapRemove(hashmap_map *m,
+                   int x,
+                   int y);*/
+
+/* Return the length of the hashmap */
+int hashmapLength(hashmap_map *m);
+
+void hashmapFree(hashmap_map *gameMap);
+
+void freeList(hashmap_list list);
+
+pawn *newPawn(int x,
+              int y,
+              int currentRound,
+              int pawnId);
+
+#endif /* HASHMAP_H */

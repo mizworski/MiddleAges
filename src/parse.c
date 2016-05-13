@@ -21,14 +21,14 @@ int getArgumentsFromString(char *bufferedString,
                            command *newCommand) {
     int argumentCount = 0;
 
-    while (argumentCount < MAX_ARGUMENT_COUNT && *bufferedString != NULL &&
+    while (argumentCount < MAX_ARGUMENT_COUNT && bufferedString != NULL &&
            *bufferedString != '\n') {
         newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString,
                                                          INTEGER_BASE);
-        printf(" %d", newCommand->data[argumentCount - 1]);
+        //printf(" %d", newCommand->data[argumentCount - 1]); // debug
     }
 
-    switch (newCommand->command_id) {
+    switch (newCommand->commandId) {
         case PARSE_ERROR:
             return -1;
         case INIT:
@@ -64,7 +64,7 @@ int getArgumentsFromString(char *bufferedString,
 }
 
 int getCommandCode(char *commandString,
-                   size_t *charsShiftInString) {
+                   int *charsShiftInString) {
     int commandCode;
     int charCount = 0;
 
@@ -75,7 +75,7 @@ int getCommandCode(char *commandString,
     }
 
     // Number or chars skipped in loop.
-    *charsShiftInString = (size_t) charCount;
+    *charsShiftInString = charCount; //BLAD
 
     // Compares lengths of operations defined in specification and operations
     // string itself with first charsShiftInString chars of operationString
@@ -115,7 +115,7 @@ int getReadLineLength(char *lineRead) {
     return charCount;
 }
 
-command *parse_command() {
+command *parseCommand() {
     char *lineReadArrayPointer = NULL;
     char lineRead[MAX_LINE_SIZE];
     char *bufferedString = NULL;
@@ -131,7 +131,7 @@ command *parse_command() {
     if (lineReadArrayPointer != NULL) {
         readLineLength = getReadLineLength(lineRead);
         if (readLineLength == MAX_LINE_SIZE) { ///< Line too long.
-            newCommand->command_id = PARSE_ERROR;
+            newCommand->commandId = PARSE_ERROR;
         } else {
             bufferedString = malloc(readLineLength * sizeof(char));
             bufferedStringInitialPointer = bufferedString;
@@ -139,13 +139,12 @@ command *parse_command() {
     }
 
     if (lineReadArrayPointer == NULL) {
-        newCommand->command_id = PARSE_ERROR;
+        newCommand->commandId = PARSE_ERROR;
     } else {
-        printf("krwa");
-        size_t charsShiftInString;
+        int charsShiftInString;
 
         // Gets operation code of available operations.
-        newCommand->command_id = getCommandCode(lineRead, &charsShiftInString);
+        newCommand->commandId = getCommandCode(lineRead, &charsShiftInString);
 
         // Copies lineRead shifted by number of characters, that was used by
         // procedure call, to bufferedString.
@@ -161,7 +160,7 @@ command *parse_command() {
     free(bufferedStringInitialPointer);
 
     if (returnValue == PARSE_ERROR) {
-        newCommand->command_id = PARSE_ERROR;
+        newCommand->commandId = PARSE_ERROR;
     }
 
     return newCommand;

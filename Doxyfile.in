@@ -353,7 +353,7 @@ SUBGROUPING            = YES
 INLINE_GROUPED_CLASSES = NO
 
 # When the INLINE_SIMPLE_STRUCTS tag is set to YES, structs, classes, and unions
-# with only public data fields or simple typedef fields will be shown inline in
+# with only public hashArrayOfLists fields or simple typedef fields will be shown inline in
 # the documentation of the scope in which they are defined (i.e. file,
 # namespace, or group documentation), provided this scope is documented. If set
 # to NO, structs, classes, and unions are shown on a separate page (for HTML and
@@ -373,9 +373,9 @@ INLINE_SIMPLE_STRUCTS  = NO
 
 TYPEDEF_HIDES_STRUCT   = NO
 
-# The size of the symbol lookup cache can be set using LOOKUP_CACHE_SIZE. This
+# The size of the id lookup cache can be set using LOOKUP_CACHE_SIZE. This
 # cache is used to resolve symbols given their name and scope. Since this can be
-# an expensive process and often the same symbol appears multiple times in the
+# an expensive process and often the same id appears multiple times in the
 # code, doxygen keeps a cache of pre-resolved symbols. If the cache is too small
 # doxygen will become slower. If the cache is too large, memory is wasted. The
 # cache size is given by this formula: 2^(16+LOOKUP_CACHE_SIZE). The valid range
@@ -796,9 +796,9 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       =
 
-# The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
+# The EXCLUDE_SYMBOLS tag can be used to specify one or more id names
 # (namespaces, classes, functions, etc.) that should be excluded from the
-# output. The symbol name can be a fully qualified name, a word, or if the
+# output. The id name can be a fully qualified name, a word, or if the
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 #
@@ -1508,7 +1508,7 @@ EXTERNAL_SEARCH        = NO
 SEARCHENGINE_URL       =
 
 # When SERVER_BASED_SEARCH and EXTERNAL_SEARCH are both enabled the unindexed
-# search data is written to a file for indexing by an external tool. With the
+# search hashArrayOfLists is written to a file for indexing by an external tool. With the
 # SEARCHDATA_FILE tag the name of this file can be specified.
 # The default file is: searchdata.xml.
 # This tag requires that the tag SEARCHENGINE is set to YES.
