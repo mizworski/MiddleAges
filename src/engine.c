@@ -45,6 +45,7 @@ void endGame() {
 }
 
 void printTopLeft() {
+    // printf("PLAYER %c ROUND\n", currentGame.playerTurn == PLAYER_A_TURN ? 'A' : 'B');
     for (int y = 1; y <= currentGame.mapSize && y <= 10; y++) {
         for (int x = 1; x <= currentGame.mapSize && x <= 10; x++) {
             printf("%c", getPawnSymbol(hashmapGet(currentGame.gameMap, x, y)));
@@ -64,14 +65,21 @@ int init(int n,
     if (!validInitialization(n, k, p, x1, y1, x2, y2)) {
         return ERROR;
     }
-    if (p == 1 && !currentGame.playerAinit) {
+
+    if (p == 2 && currentGame.playerBinit){
+        return ERROR;
+    }
+    if (p == 1 && currentGame.playerAinit){
+        return ERROR;
+    }
+
+    if (!currentGame.playerAinit && !currentGame.playerBinit) {
         currentGame.mapSize = n;
         currentGame.maxRound = k;
         currentGame.startingx1 = x1;
         currentGame.startingy1 = y1;
         currentGame.startingx2 = x2;
         currentGame.startingy2 = y2;
-        currentGame.playerAinit = true;
 
         pawn *kingA = newPawn(x1, y1, currentGame.currentRound - 1, KING_PLAYER_A_ID);
         pawn *peasantA = newPawn(x1 + 1, y1, currentGame.currentRound - 1, PEASANT_PLAYER_A_ID);
@@ -92,9 +100,14 @@ int init(int n,
         hashmapPut(currentGame.gameMap, peasantB);
         hashmapPut(currentGame.gameMap, knight1B);
         hashmapPut(currentGame.gameMap, knight2B);
-    } else if (p == 2 && !currentGame.playerBinit) {
+    }
+    if (p == 1 && !currentGame.playerAinit) {
+        currentGame.playerAinit = true;
+    }
+    if (p == 2 && !currentGame.playerBinit) {
         currentGame.playerBinit = true;
-    } else {
+    }
+    if (p != 1 && p != 2){
         return ERROR;
     }
 
@@ -115,7 +128,7 @@ int move(int x1,
         return ERROR;
     }
 
-    if (distMax(x1,y1,x2,y2) != 1) {
+    if (distMax(x1, y1, x2, y2) != 1) {
         return ERROR;
     }
 
@@ -133,11 +146,7 @@ int move(int x1,
 
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
-    if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn) ||
-        (getPawnId(currentPawn) == KING_PLAYER_B_ID &&
-         getPawnId(targetPawn) == KING_PLAYER_A_ID) ||
-        (getPawnId(targetPawn) == KING_PLAYER_B_ID &&
-         getPawnId(currentPawn) == KING_PLAYER_A_ID)) {
+    if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn)) {
         return ERROR;
     } else {
         int actionResult = performAction(currentPawn, targetPawn);
@@ -158,16 +167,24 @@ int move(int x1,
                 free(currentPawn);
                 break;
             case ATTACKER_KILLED_KING:
-                free(currentPawn);
+                currentPawn->x = (unsigned int) x2 - 1;
+                currentPawn->y = (unsigned int) y2 - 1;
+                hashmapPut(currentGame.gameMap, currentPawn);
                 free(targetPawn);
                 return currentGame.playerTurn == PLAYER_A_TURN ? PLAYER_A_WON : PLAYER_B_WON;
             case DEFENDER_KILLED_KING:
                 free(currentPawn);
-                free(targetPawn);
+                hashmapPut(currentGame.gameMap, targetPawn);
                 return currentGame.playerTurn == PLAYER_A_TURN ? PLAYER_B_WON : PLAYER_A_WON;
             case BOTH_UNITS_DIED:
-                free(currentPawn);
-                free(targetPawn);
+                if (currentPawn->id == KING_PLAYER_A_ID || currentPawn->id == KING_PLAYER_B_ID) {
+                    free(currentPawn);
+                    free(targetPawn);
+                    return DRAW;
+                } else {
+                    free(currentPawn);
+                    free(targetPawn);
+                }
                 break;
             default:
                 return ERROR;
@@ -183,8 +200,11 @@ int performAction(pawn *currentPawn,
         return UNIT_MOVED;
     }
 
+    // TODO make functions isKing, isPeasant, isKnight
     if (currentPawn->id == KING_PLAYER_A_ID || currentPawn->id == KING_PLAYER_B_ID) {
-        if (targetPawn->id == PEASANT_PLAYER_A_ID || targetPawn->id == PEASANT_PLAYER_B_ID) {
+        if (targetPawn->id == KING_PLAYER_A_ID || targetPawn->id == KING_PLAYER_B_ID) {
+            return BOTH_UNITS_DIED;
+        } else if (targetPawn->id == PEASANT_PLAYER_A_ID || targetPawn->id == PEASANT_PLAYER_B_ID) {
             return ATTACKER_KILLED;
         } else if (targetPawn->id == KNIGHT_PLAYER_A_ID || targetPawn->id == KNIGHT_PLAYER_B_ID) {
             return DEFENDER_KILLED_KING;
@@ -245,17 +265,17 @@ int produceUnit(int x1,
         return ERROR;
     }
 
-    if (distMax(x1,y1,x2,y2) != 1) {
+    if (distMax(x1, y1, x2, y2) != 1) {
         return ERROR;
     }
 
-    pawn *currentPawn = hashmapGet(currentGame.gameMap, x1, x2);
+    pawn *currentPawn = hashmapGet(currentGame.gameMap, x1, y1);
 
     if (currentPawn == NULL) {
         return ERROR;
     }
 
-    if (currentPawn->lastMove > currentGame.currentRound - 2) {
+    if (currentPawn->lastMove >= currentGame.currentRound - 2) {
         return ERROR;
     }
 
@@ -265,17 +285,18 @@ int produceUnit(int x1,
 
     if (getPawnId(currentPawn) == PEASANT_PLAYER_A_ID ||
         getPawnId(currentPawn) == PEASANT_PLAYER_B_ID) {
-        if (getPawnId(currentPawn) == EMPTY_SPACE_ID) {
+        pawn *targetPawn = hashmapGet(currentGame.gameMap, x2, y2);
+        if (getPawnId(targetPawn) == EMPTY_SPACE_ID) {
             pawn *createdPawn;
             currentPawn->lastMove = currentGame.currentRound;
             if (unitId == PEASANT_PRODUCE_ID) {
-                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1,
-                                      (currentGame.currentRound == PLAYER_A_TURN) ?
-                                      PEASANT_PLAYER_A_ID : PEASANT_PLAYER_B_ID);
+                int newPawnId = currentGame.playerTurn ==
+                                PLAYER_A_TURN ? PEASANT_PLAYER_A_ID : PEASANT_PLAYER_B_ID;
+                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1, newPawnId);
             } else if (unitId == KNIGHT_PRODUCE_ID) {
-                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1,
-                                      (currentGame.currentRound == PLAYER_A_TURN) ?
-                                      KNIGHT_PLAYER_A_ID : KNIGHT_PLAYER_B_ID);
+                int newPawnId = currentGame.playerTurn ==
+                                PLAYER_A_TURN ? KNIGHT_PLAYER_A_ID : KNIGHT_PLAYER_B_ID;
+                createdPawn = newPawn(x2, y2, currentGame.currentRound - 1, newPawnId);
             } else {
                 return ERROR;
             }
@@ -304,7 +325,7 @@ int endTurn() {
     }
 
     if (currentGame.currentRound > currentGame.maxRound) {
-        return DRAW;
+        return EXCEEDED_ROUND_LIMIT;
     }
 
     return END_TURN_RETURN_VALUE;
@@ -322,7 +343,8 @@ int distMax(int x1,
     return max(abs(x1 - x2), abs(y1 - y2));
 }
 
-bool isCloseEnough(pawn *from, pawn *to) {
+bool isCloseEnough(pawn *from,
+                   pawn *to) {
     return distMax(from->x, from->y, to->x, to->y) == 1;
 }
 

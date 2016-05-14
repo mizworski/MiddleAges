@@ -8,15 +8,17 @@ testFilesDir=$2
 echo "TESTING PROGRAM: $programName WITH TEST FILES IN DIR: $testFilesDir/"
 
 failures=0
+count=0
 
     for input in ${testFilesDir}/*.in; do
+        ((count += 2))
         echo ""
         echo "TESTING ${input%.*}..."
         ./${programName%.*} < ${input} > temp_stdout.out 2>temp_stderr.out
         diff -q "${input%.*}.out" temp_stdout.out 1>/dev/null
         if [[ $? == "0" ]]
         then
-            continue #echo "STANDARD   OUT: SUCCESS"
+            echo "STANDARD   OUT: SUCCESS"
         else
             echo "STANDARD   OUT: FAILURE"
             ((failures++))
@@ -24,7 +26,7 @@ failures=0
         diff -q "${input%.*}.err" temp_stderr.out 1>/dev/null
         if [[ $? == "0" ]]
         then
-            continue #echo "DIAGNOSTIC OUT: SUCCESS"
+            echo "DIAGNOSTIC OUT: SUCCESS"
         else
             echo "DIAGNOSTIC OUT: FAILURE"
             ((failures++))
@@ -33,4 +35,6 @@ failures=0
     rm temp_stdout.out
     rm temp_stderr.out
 
-echo "TESTS FAILED: ${failures}"
+((passed=count-failures))
+
+echo "PASSED ${passed} OUT OF ${count} TESTS"

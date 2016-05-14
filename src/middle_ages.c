@@ -58,7 +58,11 @@ int main() {
             return ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE;
         }
 
-        if (returnValue == DRAW) {
+        if (returnValue != END_TURN_RETURN_VALUE && returnValue != EXCEEDED_ROUND_LIMIT) {
+            printTopLeft();
+        }
+
+        if (returnValue == DRAW || returnValue == EXCEEDED_ROUND_LIMIT) {
             gameOver = true;
             fprintf(stderr,
                     DRAW_MESSAGE);
@@ -75,9 +79,7 @@ int main() {
                     PLAYER_B_WON_MESSAGE);
         }
 
-        if (returnValue != END_TURN_RETURN_VALUE) {
-            printTopLeft();
-        }
+
     }
 
     endGame();

@@ -14,6 +14,7 @@
 #define PLAYER_A_WON            1
 #define PLAYER_B_WON            2
 #define DRAW                    3
+#define EXCEEDED_ROUND_LIMIT    4
 
 typedef struct gameData {
     int playerTurn;
