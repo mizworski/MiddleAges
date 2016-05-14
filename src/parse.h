@@ -20,13 +20,13 @@ typedef struct def_command {
     int data[MAX_ARGS_COUNT];
 } command;
 
-int getArgumentsFromString(char *bufferedString,
+static int getArgumentsFromString(char *bufferedString,
                            command *newCommand);
 
-int getCommandCode(char *commandString,
+static int getCommandCode(char *commandString,
                    int *charsShiftInString);
 
-int getReadLineLength(char *lineRead);
+static int getReadLineLength(char *lineRead);
 
 /** Reads a command.
   Returns command with hashArrayOfLists points using 'command' structure.

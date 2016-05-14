@@ -78,8 +78,6 @@ int main() {
             fprintf(stderr,
                     PLAYER_B_WON_MESSAGE);
         }
-
-
     }
 
     endGame();

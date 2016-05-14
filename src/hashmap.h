@@ -57,27 +57,27 @@ struct pawn {
 /*
  * Return an empty hashmap, or NULL on failure.
  */
-hashmap_map *hashmapCreate();
+extern hashmap_map *hashmapCreate();
 
-unsigned int hashingFunction1(int capacity,
+static unsigned int hashingFunction1(int capacity,
                               unsigned int key);
 
-unsigned int hashingFunction2(int capacity,
+static unsigned int hashingFunction2(int capacity,
                               unsigned int key);
 
-unsigned int hashingFunction(int capacity,
+static unsigned int hashingFunction(int capacity,
                              unsigned int x,
                              unsigned int y);
 
-void hashmapRehash(hashmap_map *in);
+static void hashmapRehash(hashmap_map *in);
 
-void listAdd(pawn *currentPawn,
+static void listAdd(pawn *currentPawn,
              hashmap_list *list);
 
 void hashmapPut(hashmap_map *m,
                 pawn *currentPawn);
 
-bool isValidPawn(pawn *currentPawn,
+static bool isValidPawn(pawn *currentPawn,
                  unsigned int x,
                  unsigned int y);
 
@@ -95,11 +95,13 @@ char getPawnSymbol(pawn *currentPawn);
 
 void hashmapFree(hashmap_map *gameMap);
 
-void freeList(hashmap_list list);
+static void freeList(hashmap_list list);
 
 pawn *newPawn(int x,
               int y,
               int currentRound,
               int pawnId);
 
+static unsigned int mod(unsigned int a,
+                        unsigned int b);
 #endif /* HASHMAP_H */

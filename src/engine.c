@@ -45,7 +45,6 @@ void endGame() {
 }
 
 void printTopLeft() {
-    // printf("PLAYER %c ROUND\n", currentGame.playerTurn == PLAYER_A_TURN ? 'A' : 'B');
     for (int y = 1; y <= currentGame.mapSize && y <= 10; y++) {
         for (int x = 1; x <= currentGame.mapSize && x <= 10; x++) {
             printf("%c", getPawnSymbol(hashmapGet(currentGame.gameMap, x, y)));
@@ -194,7 +193,7 @@ int move(int x1,
     return GAME_OK;
 }
 
-int performAction(pawn *currentPawn,
+static int performAction(pawn *currentPawn,
                   pawn *targetPawn) {
     if (targetPawn == NULL) {
         return UNIT_MOVED;
@@ -250,7 +249,7 @@ int producePeasant(int x1,
     return produceUnit(x1, y1, x2, y2, PEASANT_PRODUCE_ID);
 }
 
-int produceUnit(int x1,
+static int produceUnit(int x1,
                 int y1,
                 int x2,
                 int y2,
@@ -331,12 +330,12 @@ int endTurn() {
     return END_TURN_RETURN_VALUE;
 }
 
-int max(int a,
+static int max(int a,
         int b) {
     return a > b ? a : b;
 }
 
-int distMax(int x1,
+static int distMax(int x1,
             int y1,
             int x2,
             int y2) {
@@ -344,7 +343,7 @@ int distMax(int x1,
 }
 
 
-bool isValidField(int mapSize,
+static bool isValidField(int mapSize,
                   int x,
                   int y) {
     bool isValid = true;
@@ -356,7 +355,7 @@ bool isValidField(int mapSize,
     return isValid;
 }
 
-bool validInitialization(int n,
+static bool validInitialization(int n,
                          int k,
                          int p,
                          int x1,
@@ -402,7 +401,7 @@ bool validInitialization(int n,
     return isValid;
 }
 
-int getPawnAdherence(pawn *currentPawn) {
+static int getPawnAdherence(pawn *currentPawn) {
     if (currentPawn == NULL) {
         return EMPTY_FIELD;
     }

@@ -20,7 +20,7 @@
 #define PRODUCE_PEASANT_LENGTH      strlen("PRODUCE_PEASANT")
 #define END_TURN_LENGTH             strlen("END_TURN")
 
-int getArgumentsFromString(char *bufferedString,
+static int getArgumentsFromString(char *bufferedString,
                            command *newCommand) {
     int argumentCount = 0;
     char lastDigit = '\0';
@@ -71,7 +71,7 @@ int getArgumentsFromString(char *bufferedString,
     return 0;
 }
 
-int getCommandCode(char *commandString,
+static int getCommandCode(char *commandString,
                    int *charsShiftInString) {
     int commandCode;
     int charCount = 0;
@@ -113,7 +113,7 @@ int getCommandCode(char *commandString,
     return commandCode;
 }
 
-int getReadLineLength(char *lineRead) {
+static int getReadLineLength(char *lineRead) {
     int charCount = 0;
 
     while (lineRead[charCount] != '\n' && charCount < MAX_LINE_SIZE) {

@@ -15,15 +15,10 @@ static unsigned int tab_capacity_values[] = {
         0x10000003, 0x2000000b, 0x40000003, 0x7fffffff
 };
 
-unsigned int mod(unsigned int a,
-                 unsigned int b) {
-    return a % b >= 0 ? a % b : a % b + b;
-}
-
 /*
  * Return an empty hashmap, or NULL on failure.
  */
-hashmap_map *hashmapCreate() {
+extern hashmap_map *hashmapCreate() {
     hashmap_map *m = malloc(sizeof(hashmap_map));
     if (!m) goto err;
 
@@ -44,7 +39,7 @@ hashmap_map *hashmapCreate() {
     return NULL;
 }
 
-unsigned int hashingFunction1(int capacity,
+static unsigned int hashingFunction1(int capacity,
                               unsigned int key) {
     key = (key + 0x7ed55d16) + (key << 12);
     key = (key ^ 0xc761c23c) ^ (key >> 19);
@@ -56,7 +51,7 @@ unsigned int hashingFunction1(int capacity,
     return mod(key, (unsigned int) capacity);
 }
 
-unsigned int hashingFunction2(int capacity,
+static unsigned int hashingFunction2(int capacity,
                               unsigned int key) {
     int c2 = 0x27d4eb2d; // a prime or an odd constant
 
@@ -69,14 +64,14 @@ unsigned int hashingFunction2(int capacity,
     return mod(key, (unsigned int) capacity);
 }
 
-unsigned int hashingFunction(int capacity,
+static unsigned int hashingFunction(int capacity,
                              unsigned int x,
                              unsigned int y) {
     return mod(hashingFunction1(capacity, x) + y * hashingFunction2(capacity, x),
                (unsigned int) capacity);
 }
 
-void hashmapRehash(hashmap_map *map) {
+static void hashmapRehash(hashmap_map *map) {
     int old_size;
     hashmap_list *curr;
     old_size = map->capacity;
@@ -252,7 +247,7 @@ char getPawnSymbol(pawn *currentPawn) {
     return symbol;
 }
 
-bool isValidPawn(pawn *currentPawn,
+static bool isValidPawn(pawn *currentPawn,
                  unsigned int x,
                  unsigned int y) {
     return currentPawn != NULL ? currentPawn->x == x ? currentPawn->y == y ? true : false : false :
@@ -260,7 +255,7 @@ bool isValidPawn(pawn *currentPawn,
 }
 
 
-void listAdd(pawn *currentPawn,
+static void listAdd(pawn *currentPawn,
              hashmap_list *list) {
     hashmap_element *currentElement;
     hashmap_element *newElement = malloc(sizeof(hashmap_element));
@@ -288,7 +283,7 @@ void hashmapFree(hashmap_map *gameMap) {
     free(gameMap);
 }
 
-void freeList(hashmap_list list) {
+static void freeList(hashmap_list list) {
     hashmap_element *nextElement = list.element;
 
     while (nextElement != NULL) {
@@ -314,4 +309,9 @@ pawn *newPawn(int x,
     newPawn->id = pawnId;
 
     return newPawn;
+}
+
+static unsigned int mod(unsigned int a,
+                        unsigned int b) {
+    return a % b >= 0 ? a % b : a % b + b;
 }
