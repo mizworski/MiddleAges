@@ -29,7 +29,6 @@ hashmap_map *hashmapCreate() {
 
     m->capacityCount = 0;
     m->capacity = tab_capacity_values[m->capacityCount];
-    m->size = 0;
 
     m->hashArrayOfLists = malloc(m->capacity * sizeof(hashmap_list));
     if (!m->hashArrayOfLists) goto err;
@@ -214,11 +213,6 @@ pawn *hashmapGet(hashmap_map *m,
     }
 }
 
-/* Return the length of the hashmap */
-int hashmapLength(hashmap_map *m) {
-    return m == NULL ? 0 : m->size;
-}
-
 int getPawnId(pawn *currentPawn) {
 
     return currentPawn == NULL ? EMPTY_SPACE_ID : currentPawn->id;
@@ -287,30 +281,8 @@ void listAdd(pawn *currentPawn,
     list->size++;
 }
 
-void listRemove(int x,
-                int y,
-                hashmap_list list) {
-    hashmap_element *currentElement;
-
-    if (list.element != NULL) {
-        currentElement = list.element;
-        while (currentElement->next != NULL && !isValidPawn(currentElement->next->currentPawn,
-                                                            (unsigned int) x,
-                                                            (unsigned int) y)) {
-            currentElement = currentElement->next;
-        }
-        if (currentElement->next != NULL &&
-            isValidPawn(currentElement->currentPawn, (unsigned int) x, (unsigned int) y)) {
-            hashmap_element *tempElement = currentElement->next;
-            currentElement->next = currentElement->next->next;
-            free(tempElement->currentPawn);
-            free(tempElement);
-        }
-    }
-}
-
 void hashmapFree(hashmap_map *gameMap) {
-    for (unsigned int i = 0; i < gameMap->size; i++) {
+    for (unsigned int i = 0; i < gameMap->capacity; i++) {
         freeList(gameMap->hashArrayOfLists[i]);
     }
     free(gameMap->hashArrayOfLists);

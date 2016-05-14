@@ -13,9 +13,11 @@
 #define PRODUCE_PEASANT     3
 #define END_TURN            4
 
+#define MAX_ARGS_COUNT      7
+
 typedef struct def_command {
     int commandId;
-    int data[7];
+    int data[MAX_ARGS_COUNT];
 } command;
 
 int getArgumentsFromString(char *bufferedString,

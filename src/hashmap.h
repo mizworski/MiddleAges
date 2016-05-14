@@ -34,7 +34,6 @@ typedef struct pawn pawn;
 struct hashmap_map {
     unsigned int capacity;
     unsigned int capacityCount;
-    unsigned int size;
     hashmap_list *hashArrayOfLists;
 };
 
@@ -93,17 +92,6 @@ pawn *hashmapGet(hashmap_map *m,
 int getPawnId(pawn *currentPawn);
 
 char getPawnSymbol(pawn *currentPawn);
-
-void listRemove(int x,
-                int y,
-                hashmap_list list);
-
-/*void hashmapRemove(hashmap_map *m,
-                   int x,
-                   int y);*/
-
-/* Return the length of the hashmap */
-int hashmapLength(hashmap_map *m);
 
 void hashmapFree(hashmap_map *gameMap);
 

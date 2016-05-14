@@ -31,12 +31,12 @@ void startGame() {
     currentGame.currentRound = 1;
     currentGame.mapSize = DEFAULT_INITIAL_VALUE;
     currentGame.maxRound = DEFAULT_INITIAL_VALUE;
-    currentGame.startingx1 = DEFAULT_INITIAL_VALUE;
-    currentGame.startingx2 = DEFAULT_INITIAL_VALUE;
-    currentGame.startingy1 = DEFAULT_INITIAL_VALUE;
-    currentGame.startingy2 = DEFAULT_INITIAL_VALUE;
-    currentGame.playerAinit = false;
-    currentGame.playerBinit = false;
+    currentGame.startingX1 = DEFAULT_INITIAL_VALUE;
+    currentGame.startingX2 = DEFAULT_INITIAL_VALUE;
+    currentGame.startingY1 = DEFAULT_INITIAL_VALUE;
+    currentGame.startingY2 = DEFAULT_INITIAL_VALUE;
+    currentGame.hasPlayerAInitialized = false;
+    currentGame.hasPlayerBInitialized = false;
 
 }
 
@@ -66,20 +66,20 @@ int init(int n,
         return ERROR;
     }
 
-    if (p == 2 && currentGame.playerBinit){
+    if (p == 2 && currentGame.hasPlayerBInitialized){
         return ERROR;
     }
-    if (p == 1 && currentGame.playerAinit){
+    if (p == 1 && currentGame.hasPlayerAInitialized){
         return ERROR;
     }
 
-    if (!currentGame.playerAinit && !currentGame.playerBinit) {
+    if (!currentGame.hasPlayerAInitialized && !currentGame.hasPlayerBInitialized) {
         currentGame.mapSize = n;
         currentGame.maxRound = k;
-        currentGame.startingx1 = x1;
-        currentGame.startingy1 = y1;
-        currentGame.startingx2 = x2;
-        currentGame.startingy2 = y2;
+        currentGame.startingX1 = x1;
+        currentGame.startingY1 = y1;
+        currentGame.startingX2 = x2;
+        currentGame.startingY2 = y2;
 
         pawn *kingA = newPawn(x1, y1, currentGame.currentRound - 1, KING_PLAYER_A_ID);
         pawn *peasantA = newPawn(x1 + 1, y1, currentGame.currentRound - 1, PEASANT_PLAYER_A_ID);
@@ -101,11 +101,11 @@ int init(int n,
         hashmapPut(currentGame.gameMap, knight1B);
         hashmapPut(currentGame.gameMap, knight2B);
     }
-    if (p == 1 && !currentGame.playerAinit) {
-        currentGame.playerAinit = true;
+    if (p == 1 && !currentGame.hasPlayerAInitialized) {
+        currentGame.hasPlayerAInitialized = true;
     }
-    if (p == 2 && !currentGame.playerBinit) {
-        currentGame.playerBinit = true;
+    if (p == 2 && !currentGame.hasPlayerBInitialized) {
+        currentGame.hasPlayerBInitialized = true;
     }
     if (p != 1 && p != 2){
         return ERROR;
@@ -123,8 +123,8 @@ int move(int x1,
         return ERROR;
     }
 
-    if (currentGame.playerAinit == false ||
-        currentGame.playerBinit == false) {
+    if (currentGame.hasPlayerAInitialized == false ||
+        currentGame.hasPlayerBInitialized == false) {
         return ERROR;
     }
 
@@ -260,8 +260,8 @@ int produceUnit(int x1,
         return ERROR;
     }
 
-    if (currentGame.playerAinit == false ||
-        currentGame.playerBinit == false) {
+    if (currentGame.hasPlayerAInitialized == false ||
+        currentGame.hasPlayerBInitialized == false) {
         return ERROR;
     }
 
@@ -311,8 +311,8 @@ int produceUnit(int x1,
 }
 
 int endTurn() {
-    if (currentGame.playerAinit == false ||
-        currentGame.playerBinit == false) {
+    if (currentGame.hasPlayerAInitialized == false ||
+        currentGame.hasPlayerBInitialized == false) {
         return ERROR;
     }
 
@@ -343,10 +343,6 @@ int distMax(int x1,
     return max(abs(x1 - x2), abs(y1 - y2));
 }
 
-bool isCloseEnough(pawn *from,
-                   pawn *to) {
-    return distMax(from->x, from->y, to->x, to->y) == 1;
-}
 
 bool isValidField(int mapSize,
                   int x,
@@ -375,16 +371,16 @@ bool validInitialization(int n,
     if (currentGame.maxRound != DEFAULT_INITIAL_VALUE && k != currentGame.maxRound) {
         isValid = false;
     }
-    if (currentGame.startingx1 != DEFAULT_INITIAL_VALUE && x1 != currentGame.startingx1) {
+    if (currentGame.startingX1 != DEFAULT_INITIAL_VALUE && x1 != currentGame.startingX1) {
         isValid = false;
     }
-    if (currentGame.startingy1 != DEFAULT_INITIAL_VALUE && y1 != currentGame.startingy1) {
+    if (currentGame.startingY1 != DEFAULT_INITIAL_VALUE && y1 != currentGame.startingY1) {
         isValid = false;
     }
-    if (currentGame.startingx2 != DEFAULT_INITIAL_VALUE && x2 != currentGame.startingx2) {
+    if (currentGame.startingX2 != DEFAULT_INITIAL_VALUE && x2 != currentGame.startingX2) {
         isValid = false;
     }
-    if (currentGame.startingy2 != DEFAULT_INITIAL_VALUE && y2 != currentGame.startingy2) {
+    if (currentGame.startingY2 != DEFAULT_INITIAL_VALUE && y2 != currentGame.startingY2) {
         isValid = false;
     }
     if (x1 < 1 || x1 > n - 3 || y1 < 1 || y1 > n || x2 < 1 || x2 > n - 3 || y2 < 1 || y2 > n) {

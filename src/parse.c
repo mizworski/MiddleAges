@@ -7,16 +7,18 @@
 #define MAX_LINE_SIZE               102
 #define MAX_ARGUMENT_COUNT          7
 #define INTEGER_BASE                10
-#define INIT_LENGTH                 strlen("INIT")
-#define MOVE_LENGTH                 strlen("MOVE")
-#define PRODUCE_KNIGHT_LENGTH       strlen("PRODUCE_KNIGHT")
-#define PRODUCE_PEASANT_LENGTH      strlen("PRODUCE_PEASANT")
-#define END_TURN_LENGTH             strlen("END_TURN")
+
 #define INIT_ARGS_COUNT             7
 #define MOVE_ARGS_COUNT             4
 #define PRODUCE_KNIGHT_ARGS_COUNT   4
 #define PRODUCE_PEASANT_ARGS_COUNT  4
 #define END_TURN_ARGS_COUNT         0
+
+#define INIT_LENGTH                 strlen("INIT")
+#define MOVE_LENGTH                 strlen("MOVE")
+#define PRODUCE_KNIGHT_LENGTH       strlen("PRODUCE_KNIGHT")
+#define PRODUCE_PEASANT_LENGTH      strlen("PRODUCE_PEASANT")
+#define END_TURN_LENGTH             strlen("END_TURN")
 
 int getArgumentsFromString(char *bufferedString,
                            command *newCommand) {
@@ -28,7 +30,6 @@ int getArgumentsFromString(char *bufferedString,
                                                          INTEGER_BASE);
         lastDigit = *bufferedString;
         bufferedString++;
-        //printf(" %d", newCommand->data[argumentCount - 1]); // debug
     }
 
     if (lastDigit != '\n' && lastDigit != '\0') {

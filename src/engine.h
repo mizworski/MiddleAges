@@ -21,13 +21,13 @@ typedef struct gameData {
     unsigned int currentRound;
     int mapSize;
     int maxRound;
-    int startingx1;
-    int startingy1;
-    int startingx2;
-    int startingy2;
+    int startingX1;
+    int startingY1;
+    int startingX2;
+    int startingY2;
     hashmap_map *gameMap;
-    bool playerAinit;
-    bool playerBinit;
+    bool hasPlayerAInitialized;
+    bool hasPlayerBInitialized;
 } gameData;
 
 /**
@@ -97,8 +97,6 @@ int distMax(int x1,
             int y1,
             int x2,
             int y2);
-
-bool isCloseEnough(pawn *from, pawn *to);
 
 bool isValidField(int mapSize,
                   int x,
