@@ -13,7 +13,7 @@
 #define ATTACKER_KILLED_KING    4
 #define DEFENDER_KILLED_KING    5
 
-#define NONE_POSESSION          0
+#define EMPTY_FIELD             0
 #define BELONGS_TO_A            1
 #define BELONGS_TO_B            2
 
@@ -66,10 +66,10 @@ int init(int n,
         return ERROR;
     }
 
-    if (p == 2 && currentGame.hasPlayerBInitialized){
+    if (p == 2 && currentGame.hasPlayerBInitialized) {
         return ERROR;
     }
-    if (p == 1 && currentGame.hasPlayerAInitialized){
+    if (p == 1 && currentGame.hasPlayerAInitialized) {
         return ERROR;
     }
 
@@ -107,7 +107,7 @@ int init(int n,
     if (p == 2 && !currentGame.hasPlayerBInitialized) {
         currentGame.hasPlayerBInitialized = true;
     }
-    if (p != 1 && p != 2){
+    if (p != 1 && p != 2) {
         return ERROR;
     }
 
@@ -404,7 +404,7 @@ bool validInitialization(int n,
 
 int getPawnAdherence(pawn *currentPawn) {
     if (currentPawn == NULL) {
-        return NONE_POSESSION;
+        return EMPTY_FIELD;
     }
     switch (currentPawn->id) {
         case KING_PLAYER_A_ID:
@@ -417,6 +417,6 @@ int getPawnAdherence(pawn *currentPawn) {
             return BELONGS_TO_B;
         case EMPTY_SPACE_ID:
         default:
-            return NONE_POSESSION;
+            return EMPTY_FIELD;
     }
 }

@@ -72,7 +72,6 @@ unsigned int hashingFunction2(int capacity,
 unsigned int hashingFunction(int capacity,
                              unsigned int x,
                              unsigned int y) {
-    // assert < capacity
     return mod(hashingFunction1(capacity, x) + y * hashingFunction2(capacity, x),
                (unsigned int) capacity);
 }
@@ -86,7 +85,7 @@ void hashmapRehash(hashmap_map *map) {
     map->capacity = tab_capacity_values[map->capacityCount];
     hashmap_list *temp = malloc(map->capacity * sizeof(hashmap_list));
 
-    for (int i = 0; i < map->capacity; i++) { // TODO tutaj problem segfault 13 test
+    for (int i = 0; i < map->capacity; i++) {
         temp[i].size = 0;
         temp[i].element = NULL;
     }
@@ -247,7 +246,7 @@ char getPawnSymbol(pawn *currentPawn) {
             symbol = EMPTY_SPACE_CHAR;
             break;
         default:
-            symbol = 'O'; // ERROR
+            symbol = EMPTY_SPACE_CHAR;
     }
 
     return symbol;
