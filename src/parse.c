@@ -30,7 +30,6 @@ static int getArgumentsFromString(char *bufferedString,
            *bufferedString != '\0' &&
            isdigit(*bufferedString)) {              ///< Checks if first char of string is digit.
         newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString, INTEGER_BASE);
-
         lastDigit = *bufferedString;
         bufferedString++;               ///< Skips whitespace.
     }

@@ -68,6 +68,7 @@ hashmap_map *hashmapCreate();
  */
 static unsigned int hashingFunction1(int capacity,
                                      unsigned int key);
+
 /**
  * @brief               Hashing function.
  *
@@ -77,6 +78,7 @@ static unsigned int hashingFunction1(int capacity,
  */
 static unsigned int hashingFunction2(int capacity,
                                      unsigned int key);
+
 /**
  * @brief               Hashing function.
  *
@@ -88,6 +90,7 @@ static unsigned int hashingFunction2(int capacity,
 static unsigned int hashingFunction(int capacity,
                                     unsigned int x,
                                     unsigned int y);
+
 /**
  * @brief               Rehashes map.
  *
