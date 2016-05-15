@@ -24,51 +24,55 @@ static int getArgumentsFromString(char *bufferedString,
                                   command *newCommand) {
     int argumentCount = 0;
     char lastDigit = '\0';
-    while (argumentCount < MAX_ARGUMENT_COUNT && bufferedString != NULL &&
-           *bufferedString != '\n' && *bufferedString != '\0' && isdigit(*bufferedString)) {
-        newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString,
-                                                         INTEGER_BASE);
+    while (argumentCount < MAX_ARGUMENT_COUNT &&
+           bufferedString != NULL &&
+           *bufferedString != '\n' &&
+           *bufferedString != '\0' &&
+           isdigit(*bufferedString)) {              ///< Checks if first char of string is digit.
+        newCommand->data[argumentCount++] = (int) strtol(bufferedString, &bufferedString, INTEGER_BASE);
+
         lastDigit = *bufferedString;
-        bufferedString++;
+        bufferedString++;               ///< Skips whitespace.
     }
 
     if (lastDigit != '\n' && lastDigit != '\0') {
         return PARSE_ERROR;
     }
 
+    ///< Checks if correct number of arguments were read.
     switch (newCommand->commandId) {
         case PARSE_ERROR:
-            return -1;
+            return PARSE_ERROR;
         case INIT:
             if (argumentCount != INIT_ARGS_COUNT) {
-                return -1;
+                return PARSE_ERROR;
             }
             break;
         case MOVE:
             if (argumentCount != MOVE_ARGS_COUNT) {
-                return -1;
+                return PARSE_ERROR;
             }
             break;
         case PRODUCE_KNIGHT:
             if (argumentCount != PRODUCE_KNIGHT_ARGS_COUNT) {
-                return -1;
+                return PARSE_ERROR;
             }
             break;
         case PRODUCE_PEASANT:
             if (argumentCount != PRODUCE_PEASANT_ARGS_COUNT) {
-                return -1;
+                return PARSE_ERROR;
             }
             break;
         case END_TURN:
             if (argumentCount != END_TURN_ARGS_COUNT) {
-                return -1;
+                return PARSE_ERROR;
             }
             break;
         default:
-            return -1;
+            return PARSE_ERROR;
     }
 
-    return 0;
+    return PARSE_OK;
 }
 
 static int getCommandCode(char *commandString,
@@ -76,17 +80,16 @@ static int getCommandCode(char *commandString,
     int commandCode;
     int charCount = 0;
 
-    // Finds first char in operationString that is space or new line.
+    /// Finds first char in operationString that is space or new line.
     while (commandString[charCount] != ' ' &&
            commandString[charCount] != '\n') {
         charCount++;
     }
 
-    // Number or chars skipped in loop.
-    *charsShiftInString = charCount; //BLAD
+    *charsShiftInString = charCount; ///< Number or chars skipped in loop.
 
-    // Compares lengths of operations defined in specification and operations
-    // string itself with first charsShiftInString chars of operationString
+    /// Compares lengths of operations defined in specification and operations
+    /// string itself with first charsShiftInString chars of operationString
     if (*charsShiftInString == INIT_LENGTH &&
         (strncmp(commandString, "INIT", (size_t) *charsShiftInString) == 0)) {
         commandCode = INIT;
@@ -109,7 +112,7 @@ static int getCommandCode(char *commandString,
     // Adds one to get position of first char after operation.
     (*charsShiftInString)++;
 
-    // Identifies which procedure was called.
+    // Identifies which command was called.
     return commandCode;
 }
 
@@ -127,7 +130,6 @@ command *parseCommand() {
     char *lineReadArrayPointer = NULL;
     char lineRead[MAX_LINE_SIZE];
     char *bufferedString = NULL;
-    // Pointer needed to free firstly allocated bufferedString.
     char *bufferedStringInitialPointer = bufferedString;
     int readLineLength = 0;
     command *newCommand = malloc(sizeof(command));

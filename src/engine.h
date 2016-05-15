@@ -16,18 +16,18 @@
 #define DRAW                    3
 #define EXCEEDED_ROUND_LIMIT    4
 
-typedef struct gameData {
-    int playerTurn;
-    unsigned int currentRound;
-    int mapSize;
-    int maxRound;
-    int startingX1;
-    int startingY1;
-    int startingX2;
-    int startingY2;
-    hashmap_map *gameMap;
-    bool hasPlayerAInitialized;
-    bool hasPlayerBInitialized;
+typedef struct gameData {           ///< Information about current game.
+    int playerTurn;                 ///< Which player turn currently is.
+    unsigned int currentRound;      ///< Number of current round.
+    int mapSize;                    ///< Length of map side.
+    int maxRound;                   ///< Max number of rounds.
+    int startingX1;                 ///< Initial column number of first player's king.
+    int startingY1;                 ///< Initial row number of first player's king.
+    int startingX2;                 ///< Initial column number of second player's king.
+    int startingY2;                 ///< Initial row number of second player's king.
+    hashmap_map *gameMap;           ///< Map that stores game board.
+    bool hasPlayerAInitialized;     ///< Checks if first player initialized already.
+    bool hasPlayerBInitialized;     ///< Checks if second player initialized already.
 } gameData;
 
 /**

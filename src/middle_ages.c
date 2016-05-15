@@ -6,20 +6,23 @@
 
 #define ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE     42
 
-#define PLAYER_A_WON_MESSAGE    "player 1 won\n"
-#define PLAYER_B_WON_MESSAGE    "player 2 won\n"
-#define INPUT_ERROR_MESSAGE     "input error\n"
-#define DRAW_MESSAGE            "draw\n"
+#define PLAYER_A_WON_MESSAGE                        "player 1 won\n"
+#define PLAYER_B_WON_MESSAGE                        "player 2 won\n"
+#define INPUT_ERROR_MESSAGE                         "input error\n"
+#define DRAW_MESSAGE                                "draw\n"
 
 int main() {
-    bool gameOver = false;
+    bool gameOver = false; ///<  Variable that indicate whether to terminate loop.
+
     startGame();
 
     command *newCommand;
 
     while (!gameOver) {
-        newCommand = parseCommand();
         int returnValue = 0;
+
+        newCommand = parseCommand();
+
         switch (newCommand->commandId) {
             case PARSE_ERROR:
                 returnValue = ERROR;
@@ -49,7 +52,7 @@ int main() {
                 returnValue = ERROR;
         }
 
-        free(newCommand);
+        free(newCommand); ///< Freeing command after passing it to engine.
 
         if (returnValue == ERROR) {
             endGame();

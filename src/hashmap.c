@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define MAX_CHAIN_LENGTH 64
-#define MAX_CAPACITY 0x7fffffff
+#define MAX_CHAIN_LENGTH    64              ///< Length of list when array has to be rehashed.
+#define MAX_CAPACITY        0x7fffffff      ///< Maximal capacity of array which stores lists.
 
-static unsigned int tab_capacity_values[] = {
+static unsigned int tabCapacityValues[] = {
         0x101, 0x209, 0x407, 0x805,
         0x1003, 0x2011, 0x401b, 0x8003,
         0x10001, 0x2001d, 0x40003, 0x80015,
@@ -15,28 +15,18 @@ static unsigned int tab_capacity_values[] = {
         0x10000003, 0x2000000b, 0x40000003, 0x7fffffff
 };
 
-/*
- * Return an empty hashmap, or NULL on failure.
- */
-extern hashmap_map *hashmapCreate() {
+hashmap_map *hashmapCreate() {
     hashmap_map *m = malloc(sizeof(hashmap_map));
-    if (!m) goto err;
 
     m->capacityCount = 0;
-    m->capacity = tab_capacity_values[m->capacityCount];
-
+    m->capacity = tabCapacityValues[m->capacityCount];
     m->hashArrayOfLists = malloc(m->capacity * sizeof(hashmap_list));
-    if (!m->hashArrayOfLists) goto err;
+
     for (int i = 0; i < m->capacity; i++) {
         m->hashArrayOfLists[i].size = 0;
         m->hashArrayOfLists[i].element = NULL;
     }
 
-    return m;
-    err:
-    if (m)
-        hashmapFree(m);
-    return NULL;
 }
 
 static unsigned int hashingFunction1(int capacity,
@@ -53,7 +43,7 @@ static unsigned int hashingFunction1(int capacity,
 
 static unsigned int hashingFunction2(int capacity,
                                      unsigned int key) {
-    int c2 = 0x27d4eb2d; // a prime or an odd constant
+    int c2 = 0x27d4eb2d; ///< prime or an odd constant
 
     key = (key ^ 61) ^ (key >> 16);
     key = key + (key << 3);
@@ -77,7 +67,7 @@ static void hashmapRehash(hashmap_map *map) {
     old_size = map->capacity;
 
     map->capacityCount++;
-    map->capacity = tab_capacity_values[map->capacityCount];
+    map->capacity = tabCapacityValues[map->capacityCount];
     hashmap_list *temp = malloc(map->capacity * sizeof(hashmap_list));
 
     for (int i = 0; i < map->capacity; i++) {
@@ -85,11 +75,11 @@ static void hashmapRehash(hashmap_map *map) {
         temp[i].element = NULL;
     }
 
-    /* Update the array */
+    /// Update the array
     curr = map->hashArrayOfLists;
     map->hashArrayOfLists = temp;
 
-    /* Rehash the elements */
+    /// Rehash the elements
     for (int i = 0; i < old_size; i++) {
         hashmap_element *tempElement;
         hashmap_element *currentElement = curr[i].element;
@@ -104,25 +94,25 @@ static void hashmapRehash(hashmap_map *map) {
     free(curr);
 }
 
-void hashmapPut(hashmap_map *m,
+void hashmapPut(hashmap_map *map,
                 pawn *currentPawn) {
     int hash;
     hashmap_list *list;
 
-    /* Find a place to put our value */
-    hash = hashingFunction(m->capacity, currentPawn->x, currentPawn->y);
+    /// Find a place to put our value
+    hash = hashingFunction(map->capacity, currentPawn->x, currentPawn->y);
 
-    /* Set the hashArrayOfLists */
-    list = &m->hashArrayOfLists[hash];
+    /// Set the hashArrayOfLists
+    list = &map->hashArrayOfLists[hash];
 
     listAdd(currentPawn, list);
 
-    if (list->size > MAX_CHAIN_LENGTH && m->capacity < MAX_CAPACITY) {
-        hashmapRehash(m);
+    if (list->size > MAX_CHAIN_LENGTH && map->capacity < MAX_CAPACITY) {
+        hashmapRehash(map);
     }
 }
 
-pawn *hashmapRemove(hashmap_map *m,
+pawn *hashmapRemove(hashmap_map *map,
                     int x,
                     int y) {
     int hash;
@@ -130,12 +120,12 @@ pawn *hashmapRemove(hashmap_map *m,
     hashmap_element *currentElement;
     hashmap_element *previousElement;
 
-    x--;
-    y--;
+    x--;    ///< Converts x from 1-based to 0-based.
+    y--;    ///< Converts y from 1-based to 0-based.
 
-    /* Find hashArrayOfLists location */
-    hash = hashingFunction(m->capacity, (unsigned int) x, (unsigned int) y);
-    list = &m->hashArrayOfLists[hash];
+    /// Find hashArrayOfLists location
+    hash = hashingFunction(map->capacity, (unsigned int) x, (unsigned int) y);
+    list = &map->hashArrayOfLists[hash];
 
     if (list->element == NULL) {
         return NULL;
@@ -169,26 +159,25 @@ pawn *hashmapRemove(hashmap_map *m,
     return NULL;
 }
 
-pawn *hashmapGet(hashmap_map *m,
+pawn *hashmapGet(hashmap_map *map,
                  int x,
                  int y) {
     int hash;
     hashmap_list *list;
     hashmap_element *currentElement;
 
-    x--;
-    y--;
+    x--;    ///< Converts x from 1-based to 0-based.
+    y--;    ///< Converts y from 1-based to 0-based.
 
-    /* Find hashArrayOfLists location */
-    hash = hashingFunction(m->capacity, (unsigned int) x, (unsigned int) y);
-    list = &m->hashArrayOfLists[hash];
+    /// Find hashArrayOfLists location
+    hash = hashingFunction(map->capacity, (unsigned int) x, (unsigned int) y);
+    list = &map->hashArrayOfLists[hash];
 
     if (list->element == NULL) {
         return NULL;
     } else {
         currentElement = list->element;
         while (currentElement->next != NULL && !isValidPawn(currentElement->currentPawn,
-                // TODO problem
                                                             (unsigned int) x,
                                                             (unsigned int) y)) {
             currentElement = currentElement->next;
@@ -199,7 +188,6 @@ pawn *hashmapGet(hashmap_map *m,
             if (isValidPawn(currentElement->currentPawn, (unsigned int) x, (unsigned int) y)) {
                 pawn *currentPawn = currentElement->currentPawn;
                 return currentPawn;
-
             } else {
                 return NULL;
             }
@@ -298,8 +286,8 @@ pawn *newPawn(int x,
               int y,
               int currentRound,
               int pawnId) {
-    x--;
-    y--;
+    x--;    ///< Converts x from 1-based to 0-based.
+    y--;    ///< Converts y from 1-based to 0-based.
 
     pawn *newPawn = malloc(sizeof(pawn));
 
