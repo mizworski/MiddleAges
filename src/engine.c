@@ -138,6 +138,12 @@ int move(int x1,
     }
 
     if (currentPawn->lastMove >= currentGame.currentRound) {
+        free(currentPawn);
+        return ERROR;
+    }
+
+    if (currentGame.playerTurn != getPawnAdherence(currentPawn)) {
+        free(currentPawn);
         return ERROR;
     }
 
@@ -146,6 +152,12 @@ int move(int x1,
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
     if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn)) {
+        if (currentPawn != NULL) {
+            free(currentPawn);
+        }
+        if (targetPawn != NULL) {
+            free(targetPawn);
+        }
         return ERROR;
     } else {
         int actionResult = performAction(currentPawn, targetPawn);

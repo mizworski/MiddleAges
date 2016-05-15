@@ -9,7 +9,7 @@ echo "VALGRIND TEST - PROGRAM: $programName WITH TEST FILES IN DIR: $testFilesDi
     rm valgrind.out
 
     for input in ${testFilesDir}/*.in; do
-        echo ""
-        echo "TESTING ${input%.*}..."
+        echo "" >> valgrind.out
+        echo "TESTING ${input%.*}..." >> valgrind.out
         valgrind ./${programName%.*} < ${input} >/dev/null 2>>valgrind.out
     done

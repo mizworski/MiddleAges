@@ -131,15 +131,19 @@ command *parseCommand() {
     char *bufferedStringInitialPointer = bufferedString;
     int readLineLength = 0;
     command *newCommand = malloc(sizeof(command));
+
     newCommand->commandId = 0;
+    for (int i = 0; i < MAX_ARGUMENT_COUNT; i++) {
+        newCommand->data[i] = 0;
+    }
     int returnValue = 0;
-    // TODO still waiting
+
     // When function fails to read new line it returns null.
     lineReadArrayPointer = fgets(lineRead, MAX_LINE_SIZE, stdin);
     // Allocation of bufferedString
     if (lineReadArrayPointer != NULL) {
         readLineLength = getReadLineLength(lineRead);
-        if (readLineLength == MAX_LINE_SIZE) { ///< Line too long.
+        if (readLineLength == MAX_LINE_SIZE || readLineLength == 0) { ///< Line too long or empty.
             newCommand->commandId = PARSE_ERROR;
         } else {
             bufferedString = malloc(readLineLength * sizeof(char));
@@ -159,14 +163,17 @@ command *parseCommand() {
         // procedure call, to bufferedString.
         // Safe to use because bufferString size is not greater than
         // MAX_LINE_SIZE
-        strcpy(bufferedString, lineReadArrayPointer + charsShiftInString);
-
-        returnValue = getArgumentsFromString(bufferedString,
-                                             newCommand);
+        if (newCommand->commandId != PARSE_ERROR) {
+            strcpy(bufferedString, lineReadArrayPointer + charsShiftInString);
+            returnValue = getArgumentsFromString(bufferedString,
+                                                 newCommand);
+        }
     }
 
     // Frees buffer that is not needed anymore.
-    free(bufferedStringInitialPointer);
+    if (bufferedStringInitialPointer != NULL) {
+        free(bufferedStringInitialPointer);
+    }
 
     if (returnValue == PARSE_ERROR) {
         newCommand->commandId = PARSE_ERROR;
