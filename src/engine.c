@@ -152,9 +152,7 @@ int move(int x1,
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
     if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn)) {
-        if (currentPawn != NULL) {
-            free(currentPawn);
-        }
+        free(currentPawn);
         if (targetPawn != NULL) {
             free(targetPawn);
         }
@@ -211,33 +209,32 @@ static int performAction(pawn *currentPawn,
         return UNIT_MOVED;
     }
 
-    // TODO make functions isKing, isPeasant, isKnight
-    if (currentPawn->id == KING_PLAYER_A_ID || currentPawn->id == KING_PLAYER_B_ID) {
-        if (targetPawn->id == KING_PLAYER_A_ID || targetPawn->id == KING_PLAYER_B_ID) {
+    if (isKing(currentPawn)) {
+        if (isKing(targetPawn)) {
             return BOTH_UNITS_DIED;
-        } else if (targetPawn->id == PEASANT_PLAYER_A_ID || targetPawn->id == PEASANT_PLAYER_B_ID) {
+        } else if (isPeasant(targetPawn)) {
             return ATTACKER_KILLED;
-        } else if (targetPawn->id == KNIGHT_PLAYER_A_ID || targetPawn->id == KNIGHT_PLAYER_B_ID) {
+        } else if (isKnight(targetPawn)) {
             return DEFENDER_KILLED_KING;
         } else {
             return ERROR;
         }
-    } else if (currentPawn->id == PEASANT_PLAYER_A_ID || currentPawn->id == PEASANT_PLAYER_B_ID) {
-        if (targetPawn->id == KING_PLAYER_A_ID || targetPawn->id == KING_PLAYER_B_ID) {
+    } else if (isPeasant(currentPawn)) {
+        if (isKing(targetPawn)) {
             return DEFENDER_KILLED;
-        } else if (targetPawn->id == PEASANT_PLAYER_A_ID || targetPawn->id == PEASANT_PLAYER_B_ID) {
+        } else if (isPeasant(targetPawn)) {
             return BOTH_UNITS_DIED;
-        } else if (targetPawn->id == KNIGHT_PLAYER_A_ID || targetPawn->id == KNIGHT_PLAYER_B_ID) {
+        } else if (isKnight(targetPawn)) {
             return DEFENDER_KILLED;
         } else {
             return ERROR;
         }
-    } else if (currentPawn->id == KNIGHT_PLAYER_A_ID || currentPawn->id == KNIGHT_PLAYER_B_ID) {
-        if (targetPawn->id == KING_PLAYER_A_ID || targetPawn->id == KING_PLAYER_B_ID) {
+    } else if (isKnight(currentPawn)) {
+        if (isKing(targetPawn)) {
             return ATTACKER_KILLED_KING;
-        } else if (targetPawn->id == PEASANT_PLAYER_A_ID || targetPawn->id == PEASANT_PLAYER_B_ID) {
+        } else if (isPeasant(targetPawn)) {
             return ATTACKER_KILLED;
-        } else if (targetPawn->id == KNIGHT_PLAYER_A_ID || targetPawn->id == KNIGHT_PLAYER_B_ID) {
+        } else if (isKnight(targetPawn)) {
             return BOTH_UNITS_DIED;
         } else {
             return ERROR;
@@ -245,6 +242,18 @@ static int performAction(pawn *currentPawn,
     } else {
         return ERROR;
     }
+}
+
+static bool isKing(pawn *currentPawn) {
+    return currentPawn->id == KING_PLAYER_A_ID || currentPawn->id == KING_PLAYER_B_ID;
+}
+
+static bool isKnight(pawn *currentPawn) {
+    return currentPawn->id == KNIGHT_PLAYER_A_ID || currentPawn->id == KNIGHT_PLAYER_B_ID;
+}
+
+static bool isPeasant(pawn *currentPawn) {
+    return currentPawn->id == PEASANT_PLAYER_A_ID || currentPawn->id == PEASANT_PLAYER_B_ID;
 }
 
 int produceKnight(int x1,

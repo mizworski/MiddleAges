@@ -67,6 +67,12 @@ int move(int x1,
 static int performAction(pawn *currentPawn,
                          pawn *targetPawn);
 
+static bool isKing(pawn *currentPawn);
+
+static bool isKnight(pawn *currentPawn);
+
+static bool isPeasant(pawn *currentPawn);
+
 int produceKnight(int x1,
                   int y1,
                   int x2,
