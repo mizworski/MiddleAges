@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 project(middle_ages C)
 
 # deklarujemy opcję DEBUG, domyślnie wyłączoną (opcję można włączyć przez argument -DDEBUG=ON)
-#option (DEBUG OFF)
+option (DEBUG OFF)
 
 # jeśli DEBUG == ON, ustawiamy zmienną specyfikującą typ kompilacji na wartość DEBUG, wpp. na release
-#if (DEBUG)
-#    set(CMAKE_BUILD_TYPE DEBUG)
-#else (DEBUG)
-#    set(CMAKE_BUILD_TYPE RELEASE)
-#endif (DEBUG)
+if (DEBUG)
+    set(CMAKE_BUILD_TYPE DEBUG)
+else (DEBUG)
+    set(CMAKE_BUILD_TYPE RELEASE)
+endif (DEBUG)
 
 # ustawiamy flagi kompilacji w wersji debug i release
 set(CMAKE_C_FLAGS_DEBUG "-std=gnu99 -Wall -pedantic -g")
