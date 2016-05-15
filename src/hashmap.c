@@ -16,17 +16,18 @@ static unsigned int tabCapacityValues[] = {
 };
 
 hashmap_map *hashmapCreate() {
-    hashmap_map *m = malloc(sizeof(hashmap_map));
+    hashmap_map *map = malloc(sizeof(hashmap_map));
 
-    m->capacityCount = 0;
-    m->capacity = tabCapacityValues[m->capacityCount];
-    m->hashArrayOfLists = malloc(m->capacity * sizeof(hashmap_list));
+    map->capacityCount = 0;
+    map->capacity = tabCapacityValues[map->capacityCount];
+    map->hashArrayOfLists = malloc(map->capacity * sizeof(hashmap_list));
 
-    for (int i = 0; i < m->capacity; i++) {
-        m->hashArrayOfLists[i].size = 0;
-        m->hashArrayOfLists[i].element = NULL;
+    for (int i = 0; i < map->capacity; i++) {
+        map->hashArrayOfLists[i].size = 0;
+        map->hashArrayOfLists[i].element = NULL;
     }
 
+    return map;
 }
 
 static unsigned int hashingFunction1(int capacity,

@@ -6,6 +6,10 @@
 
 #define DEFAULT_INITIAL_VALUE   -1
 
+#define MIN_INITIAL_DIST        8
+#define MIN_MAP_SIZE            8
+#define MAX_MAP_SIZE            pow(2, 31)
+
 #define UNIT_MOVED              0
 #define ATTACKER_KILLED         1
 #define DEFENDER_KILLED         2
@@ -37,7 +41,6 @@ void startGame() {
     currentGame.startingY2 = DEFAULT_INITIAL_VALUE;
     currentGame.hasPlayerAInitialized = false;
     currentGame.hasPlayerBInitialized = false;
-
 }
 
 void endGame() {
@@ -61,14 +64,18 @@ int init(int n,
          int y1,
          int x2,
          int y2) {
+    /// Validates initialization.
     if (!validInitialization(n, k, p, x1, y1, x2, y2)) {
         return ERROR;
     }
 
-    if (p == 2 && currentGame.hasPlayerBInitialized) {
+    /// Checks if first player initialized game already.
+    if (p == 1 && currentGame.hasPlayerAInitialized) {
         return ERROR;
     }
-    if (p == 1 && currentGame.hasPlayerAInitialized) {
+
+    /// Checks if second player initialized game already.
+    if (p == 2 && currentGame.hasPlayerBInitialized) {
         return ERROR;
     }
 
@@ -80,6 +87,8 @@ int init(int n,
         currentGame.startingX2 = x2;
         currentGame.startingY2 = y2;
 
+        /// Initializes last round to 0, so pawns can move immediately.
+        /// Places them on 4 fields next to each other in same row, starting from king.
         pawn *kingA = newPawn(x1, y1, currentGame.currentRound - 1, KING_PLAYER_A_ID);
         pawn *peasantA = newPawn(x1 + 1, y1, currentGame.currentRound - 1, PEASANT_PLAYER_A_ID);
         pawn *knight1A = newPawn(x1 + 2, y1, currentGame.currentRound - 1, KNIGHT_PLAYER_A_ID);
@@ -100,13 +109,16 @@ int init(int n,
         hashmapPut(currentGame.gameMap, knight1B);
         hashmapPut(currentGame.gameMap, knight2B);
     }
+
     if (p == 1 && !currentGame.hasPlayerAInitialized) {
         currentGame.hasPlayerAInitialized = true;
     }
+
     if (p == 2 && !currentGame.hasPlayerBInitialized) {
         currentGame.hasPlayerBInitialized = true;
     }
-    if (p != 1 && p != 2) {
+
+    if (p != 1 && p != 2) { ///< Wrong player initialization.
         return ERROR;
     }
 
@@ -117,31 +129,38 @@ int move(int x1,
          int y1,
          int x2,
          int y2) {
+    /// Validates fields.
     if (!isValidField(currentGame.mapSize, x1, y1) ||
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
     }
 
+    /// Validates initialization.
     if (currentGame.hasPlayerAInitialized == false ||
         currentGame.hasPlayerBInitialized == false) {
         return ERROR;
     }
 
+    /// Validates distance between fields.
     if (distMax(x1, y1, x2, y2) != 1) {
         return ERROR;
     }
 
+    /// Picks pawn from board.
     pawn *currentPawn = hashmapRemove(currentGame.gameMap, x1, y1);
 
+    /// Checks if any pawn was picked.
     if (currentPawn == NULL) {
         return ERROR;
     }
 
+    /// Checks if pawn is able to move.
     if (currentPawn->lastMove >= currentGame.currentRound) {
         free(currentPawn);
         return ERROR;
     }
 
+    /// Checks if pawn belong to current player.
     if (currentGame.playerTurn != getPawnAdherence(currentPawn)) {
         free(currentPawn);
         return ERROR;
@@ -152,6 +171,7 @@ int move(int x1,
     pawn *targetPawn = hashmapRemove(currentGame.gameMap, x2, y2);
 
     if (getPawnAdherence(currentPawn) == getPawnAdherence(targetPawn)) {
+        ///< Player wants to move onto his own pawn.
         free(currentPawn);
         if (targetPawn != NULL) {
             free(targetPawn);
@@ -160,8 +180,10 @@ int move(int x1,
     } else {
         int actionResult = performAction(currentPawn, targetPawn);
         switch (actionResult) {
+            /// Frees pawn that was killed.
+            /// Puts pawn that survived.
             case UNIT_MOVED:
-                currentPawn->x = (unsigned int) x2 - 1;
+                currentPawn->x = (unsigned int) x2 - 1; ///< 1-based to 0-based.
                 currentPawn->y = (unsigned int) y2 - 1;
                 hashmapPut(currentGame.gameMap, currentPawn);
                 break;
@@ -180,16 +202,18 @@ int move(int x1,
                 currentPawn->y = (unsigned int) y2 - 1;
                 hashmapPut(currentGame.gameMap, currentPawn);
                 free(targetPawn);
+                /// Player that made move is victorious.
                 return currentGame.playerTurn == PLAYER_A_TURN ? PLAYER_A_WON : PLAYER_B_WON;
             case DEFENDER_KILLED_KING:
                 free(currentPawn);
                 hashmapPut(currentGame.gameMap, targetPawn);
+                /// Player that made move is beaten.
                 return currentGame.playerTurn == PLAYER_A_TURN ? PLAYER_B_WON : PLAYER_A_WON;
             case BOTH_UNITS_DIED:
-                if (currentPawn->id == KING_PLAYER_A_ID || currentPawn->id == KING_PLAYER_B_ID) {
+                if (isKing(currentPawn)) {
                     free(currentPawn);
                     free(targetPawn);
-                    return DRAW;
+                    return DRAW; ///< Kings killed each other.
                 } else {
                     free(currentPawn);
                     free(targetPawn);
@@ -205,7 +229,7 @@ int move(int x1,
 
 static int performAction(pawn *currentPawn,
                          pawn *targetPawn) {
-    if (targetPawn == NULL) {
+    if (targetPawn == NULL) { ///< Targeted field was empty.
         return UNIT_MOVED;
     }
 
@@ -275,6 +299,7 @@ static int produceUnit(int x1,
                        int x2,
                        int y2,
                        int unitId) {
+    /// Validates initialization.
     if (!isValidField(currentGame.mapSize, x1, y1) ||
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
@@ -285,63 +310,68 @@ static int produceUnit(int x1,
         return ERROR;
     }
 
+    /// Validates distance.
     if (distMax(x1, y1, x2, y2) != 1) {
         return ERROR;
     }
 
+    /// Picks pawn from board.
     pawn *currentPawn = hashmapGet(currentGame.gameMap, x1, y1);
 
+    /// Checks if pawn was picked.
     if (currentPawn == NULL) {
         return ERROR;
     }
 
+    /// Checks if pawn is able to produce.
     if (currentPawn->lastMove >= currentGame.currentRound - 2) {
         return ERROR;
     }
 
+    /// Checks if pawn belongs to current player.
     if (currentGame.playerTurn != getPawnAdherence(currentPawn)) {
         return ERROR;
     }
 
-    if (getPawnId(currentPawn) == PEASANT_PLAYER_A_ID ||
-        getPawnId(currentPawn) == PEASANT_PLAYER_B_ID) {
+    if (isPeasant(currentPawn)) {
         pawn *targetPawn = hashmapGet(currentGame.gameMap, x2, y2);
         if (getPawnId(targetPawn) == EMPTY_SPACE_ID) {
             pawn *createdPawn;
             currentPawn->lastMove = currentGame.currentRound;
             if (unitId == PEASANT_PRODUCE_ID) {
-                int newPawnId = currentGame.playerTurn ==
-                                PLAYER_A_TURN ? PEASANT_PLAYER_A_ID : PEASANT_PLAYER_B_ID;
+                int newPawnId = currentGame.playerTurn == PLAYER_A_TURN ?
+                                PEASANT_PLAYER_A_ID : PEASANT_PLAYER_B_ID;
                 createdPawn = newPawn(x2, y2, currentGame.currentRound - 1, newPawnId);
             } else if (unitId == KNIGHT_PRODUCE_ID) {
-                int newPawnId = currentGame.playerTurn ==
-                                PLAYER_A_TURN ? KNIGHT_PLAYER_A_ID : KNIGHT_PLAYER_B_ID;
+                int newPawnId = currentGame.playerTurn == PLAYER_A_TURN ?
+                                KNIGHT_PLAYER_A_ID : KNIGHT_PLAYER_B_ID;
                 createdPawn = newPawn(x2, y2, currentGame.currentRound - 1, newPawnId);
-            } else {
+            } else { ///< Tried to produce wrong unit.
                 return ERROR;
             }
             hashmapPut(currentGame.gameMap, createdPawn);
             return GAME_OK;
-        } else {
+        } else { ///< Field was not empty.
             return ERROR;
         }
-    } else {
+    } else { ///< Unit that tried to produce was not peasant.
         return ERROR;
     }
 }
 
 int endTurn() {
+    /// Validates initialization.
     if (currentGame.hasPlayerAInitialized == false ||
         currentGame.hasPlayerBInitialized == false) {
         return ERROR;
     }
 
+    /// Changes player turn.
     if (currentGame.playerTurn == PLAYER_A_TURN) {
         currentGame.playerTurn = PLAYER_B_TURN;
     } else {
-
         currentGame.playerTurn = PLAYER_A_TURN;
-        currentGame.currentRound++;
+        currentGame.currentRound++; ///< Both players ended turns. New round starts.
     }
 
     if (currentGame.currentRound > currentGame.maxRound) {
@@ -369,6 +399,7 @@ static bool isValidField(int mapSize,
                          int y) {
     bool isValid = true;
 
+    /// Checks if field is out of map bounds.
     if (x < 1 || x > mapSize || y < 1 || y > mapSize) {
         isValid = false;
     }
@@ -385,36 +416,49 @@ static bool validInitialization(int n,
                                 int y2) {
     bool isValid = true;
 
+    /// Checks if both initializations had same parameters.
     if (currentGame.mapSize != DEFAULT_INITIAL_VALUE && n != currentGame.mapSize) {
         isValid = false;
     }
+
     if (currentGame.maxRound != DEFAULT_INITIAL_VALUE && k != currentGame.maxRound) {
         isValid = false;
     }
+
     if (currentGame.startingX1 != DEFAULT_INITIAL_VALUE && x1 != currentGame.startingX1) {
         isValid = false;
     }
+
     if (currentGame.startingY1 != DEFAULT_INITIAL_VALUE && y1 != currentGame.startingY1) {
         isValid = false;
     }
+
     if (currentGame.startingX2 != DEFAULT_INITIAL_VALUE && x2 != currentGame.startingX2) {
         isValid = false;
     }
+
     if (currentGame.startingY2 != DEFAULT_INITIAL_VALUE && y2 != currentGame.startingY2) {
         isValid = false;
     }
+
+    /// Checks if kings were initialized on valid fields.
     if (x1 < 1 || x1 > n - 3 || y1 < 1 || y1 > n || x2 < 1 || x2 > n - 3 || y2 < 1 || y2 > n) {
         isValid = false;
     }
-    if (distMax(x1, y1, x2, y2) < 8) {
+
+    /// Checks distance between kings.
+    if (distMax(x1, y1, x2, y2) < MIN_INITIAL_DIST) {
         isValid = false;
     }
-    if (n <= 8 || n >= pow(2, 31)) { // TODO change to static
+
+    if (n <= MIN_MAP_SIZE || n >= MAX_MAP_SIZE) {
         isValid = false;
     }
-    if (k < 1 || n >= pow(2, 31)) {
+
+    if (k < 1 || n >= MAX_MAP_SIZE) {
         isValid = false;
     }
+
     if (p != 1 && p != 2) {
         isValid = false;
     }
