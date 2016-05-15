@@ -9,6 +9,7 @@
 #define MIN_INITIAL_DIST        8
 #define MIN_MAP_SIZE            8
 #define MAX_MAP_SIZE            pow(2, 31)
+#define MAX_ROUND_LIMIT         pow(2, 31)
 
 #define UNIT_MOVED              0
 #define ATTACKER_KILLED         1
@@ -451,11 +452,13 @@ static bool validInitialization(int n,
         isValid = false;
     }
 
+    /// Checks if board is out of bounds.
     if (n <= MIN_MAP_SIZE || n >= MAX_MAP_SIZE) {
         isValid = false;
     }
 
-    if (k < 1 || n >= MAX_MAP_SIZE) {
+    /// Checks if round limit is out of bounds.
+    if (k < 1 || n >= MAX_ROUND_LIMIT) {
         isValid = false;
     }
 
