@@ -40,7 +40,7 @@ extern hashmap_map *hashmapCreate() {
 }
 
 static unsigned int hashingFunction1(int capacity,
-                              unsigned int key) {
+                                     unsigned int key) {
     key = (key + 0x7ed55d16) + (key << 12);
     key = (key ^ 0xc761c23c) ^ (key >> 19);
     key = (key + 0x165667b1) + (key << 5);
@@ -52,7 +52,7 @@ static unsigned int hashingFunction1(int capacity,
 }
 
 static unsigned int hashingFunction2(int capacity,
-                              unsigned int key) {
+                                     unsigned int key) {
     int c2 = 0x27d4eb2d; // a prime or an odd constant
 
     key = (key ^ 61) ^ (key >> 16);
@@ -65,8 +65,8 @@ static unsigned int hashingFunction2(int capacity,
 }
 
 static unsigned int hashingFunction(int capacity,
-                             unsigned int x,
-                             unsigned int y) {
+                                    unsigned int x,
+                                    unsigned int y) {
     return mod(hashingFunction1(capacity, x) + y * hashingFunction2(capacity, x),
                (unsigned int) capacity);
 }
@@ -248,15 +248,15 @@ char getPawnSymbol(pawn *currentPawn) {
 }
 
 static bool isValidPawn(pawn *currentPawn,
-                 unsigned int x,
-                 unsigned int y) {
+                        unsigned int x,
+                        unsigned int y) {
     return currentPawn != NULL ? currentPawn->x == x ? currentPawn->y == y ? true : false : false :
            false;
 }
 
 
 static void listAdd(pawn *currentPawn,
-             hashmap_list *list) {
+                    hashmap_list *list) {
     hashmap_element *currentElement;
     hashmap_element *newElement = malloc(sizeof(hashmap_element));
     newElement->currentPawn = currentPawn;

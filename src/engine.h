@@ -65,7 +65,7 @@ int move(int x1,
          int y2);
 
 static int performAction(pawn *currentPawn,
-                  pawn *targetPawn);
+                         pawn *targetPawn);
 
 int produceKnight(int x1,
                   int y1,
@@ -78,10 +78,10 @@ int producePeasant(int x1,
                    int y2);
 
 static int produceUnit(int x1,
-                int y1,
-                int x2,
-                int y2,
-                int unitId);
+                       int y1,
+                       int x2,
+                       int y2,
+                       int unitId);
 
 int endTurn();
 
@@ -91,24 +91,24 @@ int endTurn();
 void printTopLeft();
 
 static int max(int a,
-        int b);
+               int b);
 
 static int distMax(int x1,
-            int y1,
-            int x2,
-            int y2);
+                   int y1,
+                   int x2,
+                   int y2);
 
 static bool isValidField(int mapSize,
-                  int x,
-                  int y);
+                         int x,
+                         int y);
 
 static bool validInitialization(int n,
-                         int k,
-                         int p,
-                         int x1,
-                         int y1,
-                         int x2,
-                         int y2);
+                                int k,
+                                int p,
+                                int x1,
+                                int y1,
+                                int x2,
+                                int y2);
 
 
 static int getPawnAdherence(pawn *currentPawn);

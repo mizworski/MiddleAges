@@ -60,26 +60,26 @@ struct pawn {
 extern hashmap_map *hashmapCreate();
 
 static unsigned int hashingFunction1(int capacity,
-                              unsigned int key);
+                                     unsigned int key);
 
 static unsigned int hashingFunction2(int capacity,
-                              unsigned int key);
+                                     unsigned int key);
 
 static unsigned int hashingFunction(int capacity,
-                             unsigned int x,
-                             unsigned int y);
+                                    unsigned int x,
+                                    unsigned int y);
 
 static void hashmapRehash(hashmap_map *in);
 
 static void listAdd(pawn *currentPawn,
-             hashmap_list *list);
+                    hashmap_list *list);
 
 void hashmapPut(hashmap_map *m,
                 pawn *currentPawn);
 
 static bool isValidPawn(pawn *currentPawn,
-                 unsigned int x,
-                 unsigned int y);
+                        unsigned int x,
+                        unsigned int y);
 
 pawn *hashmapRemove(hashmap_map *m,
                     int x,
@@ -104,4 +104,5 @@ pawn *newPawn(int x,
 
 static unsigned int mod(unsigned int a,
                         unsigned int b);
+
 #endif /* HASHMAP_H */

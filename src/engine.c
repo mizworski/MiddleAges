@@ -206,7 +206,7 @@ int move(int x1,
 }
 
 static int performAction(pawn *currentPawn,
-                  pawn *targetPawn) {
+                         pawn *targetPawn) {
     if (targetPawn == NULL) {
         return UNIT_MOVED;
     }
@@ -262,10 +262,10 @@ int producePeasant(int x1,
 }
 
 static int produceUnit(int x1,
-                int y1,
-                int x2,
-                int y2,
-                int unitId) {
+                       int y1,
+                       int x2,
+                       int y2,
+                       int unitId) {
     if (!isValidField(currentGame.mapSize, x1, y1) ||
         !isValidField(currentGame.mapSize, x2, y2)) {
         return ERROR;
@@ -343,21 +343,21 @@ int endTurn() {
 }
 
 static int max(int a,
-        int b) {
+               int b) {
     return a > b ? a : b;
 }
 
 static int distMax(int x1,
-            int y1,
-            int x2,
-            int y2) {
+                   int y1,
+                   int x2,
+                   int y2) {
     return max(abs(x1 - x2), abs(y1 - y2));
 }
 
 
 static bool isValidField(int mapSize,
-                  int x,
-                  int y) {
+                         int x,
+                         int y) {
     bool isValid = true;
 
     if (x < 1 || x > mapSize || y < 1 || y > mapSize) {
@@ -368,12 +368,12 @@ static bool isValidField(int mapSize,
 }
 
 static bool validInitialization(int n,
-                         int k,
-                         int p,
-                         int x1,
-                         int y1,
-                         int x2,
-                         int y2) {
+                                int k,
+                                int p,
+                                int x1,
+                                int y1,
+                                int x2,
+                                int y2) {
     bool isValid = true;
 
     if (currentGame.mapSize != DEFAULT_INITIAL_VALUE && n != currentGame.mapSize) {

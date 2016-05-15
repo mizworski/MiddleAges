@@ -21,10 +21,10 @@ typedef struct def_command {
 } command;
 
 static int getArgumentsFromString(char *bufferedString,
-                           command *newCommand);
+                                  command *newCommand);
 
 static int getCommandCode(char *commandString,
-                   int *charsShiftInString);
+                          int *charsShiftInString);
 
 static int getReadLineLength(char *lineRead);
 

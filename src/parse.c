@@ -21,7 +21,7 @@
 #define END_TURN_LENGTH             strlen("END_TURN")
 
 static int getArgumentsFromString(char *bufferedString,
-                           command *newCommand) {
+                                  command *newCommand) {
     int argumentCount = 0;
     char lastDigit = '\0';
     while (argumentCount < MAX_ARGUMENT_COUNT && bufferedString != NULL &&
@@ -72,7 +72,7 @@ static int getArgumentsFromString(char *bufferedString,
 }
 
 static int getCommandCode(char *commandString,
-                   int *charsShiftInString) {
+                          int *charsShiftInString) {
     int commandCode;
     int charCount = 0;
 
