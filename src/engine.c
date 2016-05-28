@@ -40,8 +40,7 @@ void startGame() {
     currentGame.startingX2 = DEFAULT_INITIAL_VALUE;
     currentGame.startingY1 = DEFAULT_INITIAL_VALUE;
     currentGame.startingY2 = DEFAULT_INITIAL_VALUE;
-    currentGame.hasPlayerAInitialized = false;
-    currentGame.hasPlayerBInitialized = false;
+    currentGame.isInitialized = false;
 }
 
 void endGame() {
@@ -71,16 +70,11 @@ int init(int n,
     }
 
     /// Checks if first player initialized game already.
-    if (p == 1 && currentGame.hasPlayerAInitialized) {
+    if (currentGame.isInitialized) {
         return ERROR;
     }
 
-    /// Checks if second player initialized game already.
-    if (p == 2 && currentGame.hasPlayerBInitialized) {
-        return ERROR;
-    }
-
-    if (!currentGame.hasPlayerAInitialized && !currentGame.hasPlayerBInitialized) {
+    if (!currentGame.isInitialized) {
         currentGame.mapSize = n;
         currentGame.maxRound = k;
         currentGame.startingX1 = x1;
@@ -111,12 +105,8 @@ int init(int n,
         hashmapPut(currentGame.gameMap, knight2B);
     }
 
-    if (p == 1 && !currentGame.hasPlayerAInitialized) {
-        currentGame.hasPlayerAInitialized = true;
-    }
-
-    if (p == 2 && !currentGame.hasPlayerBInitialized) {
-        currentGame.hasPlayerBInitialized = true;
+    if (!currentGame.isInitialized) {
+        currentGame.isInitialized = true;
     }
 
     if (p != 1 && p != 2) { ///< Wrong player initialization.
@@ -137,8 +127,7 @@ int move(int x1,
     }
 
     /// Validates initialization.
-    if (currentGame.hasPlayerAInitialized == false ||
-        currentGame.hasPlayerBInitialized == false) {
+    if (currentGame.isInitialized == false) {
         return ERROR;
     }
 
@@ -306,8 +295,7 @@ static int produceUnit(int x1,
         return ERROR;
     }
 
-    if (currentGame.hasPlayerAInitialized == false ||
-        currentGame.hasPlayerBInitialized == false) {
+    if (currentGame.isInitialized == false) {
         return ERROR;
     }
 
@@ -362,8 +350,7 @@ static int produceUnit(int x1,
 
 int endTurn() {
     /// Validates initialization.
-    if (currentGame.hasPlayerAInitialized == false ||
-        currentGame.hasPlayerBInitialized == false) {
+    if (currentGame.isInitialized == false) {
         return ERROR;
     }
 
@@ -486,4 +473,9 @@ static int getPawnAdherence(pawn *currentPawn) {
         default:
             return EMPTY_FIELD;
     }
+}
+
+void makeMoves() {
+    fprintf(stdout,
+            "END_TURN\n");
 }

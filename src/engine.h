@@ -26,8 +26,7 @@ typedef struct gameData {           ///< Information about current game.
     int startingX2;                 ///< Initial column number of second player's king.
     int startingY2;                 ///< Initial row number of second player's king.
     hashmap_map *gameMap;           ///< Map that stores game board.
-    bool hasPlayerAInitialized;     ///< Checks if first player initialized already.
-    bool hasPlayerBInitialized;     ///< Checks if second player initialized already.
+    bool isInitialized;             ///< Checks if bot has been initialized.
 } gameData;
 
 /**
@@ -212,5 +211,7 @@ static bool validInitialization(int n,
  * @return              Identifier of player that possess pawn.
  */
 static int getPawnAdherence(pawn *currentPawn);
+
+void makeMoves();
 
 #endif /* ENGINE_H */
