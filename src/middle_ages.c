@@ -65,7 +65,11 @@ int main() {
                 returnValue = ERROR;
         }
 
-        if (currentPlayer == myNumber && returnValue != EXCEEDED_ROUND_LIMIT) {
+        if (currentPlayer == myNumber &&
+            returnValue != EXCEEDED_ROUND_LIMIT &&
+            returnValue != DRAW &&
+            returnValue != PLAYER_A_WON &&
+            returnValue != PLAYER_B_WON) {
             makeMoves();
             returnValue = endTurn();
             changePlayer(&currentPlayer);

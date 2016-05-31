@@ -137,60 +137,68 @@ if [[ $H1 -eq 1 ]] && [[ $H2 -eq 1 ]]; then
         :
     done
 elif [[ $H1 -eq 1 ]]; then
-    while kill -0 $AI2_PID 2> /dev/null; do
+    while [[ -e /proc/$AI2_PID ]]; do
         read a <&4
-        while [[ ! $a == "END_TURN" ]]; do
-            echo $a >&3
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$PROGRAM_PID ]]; do
             echo $a >&7
-            read a <&4
+            if [[ -e /proc/$AI2_PID ]]; then
+                read a <&4
+            fi
         done
         echo $a >&7
-        echo $a >&3
 
         read a <&8
-        while [[ ! $a == "END_TURN" ]]; do
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI2_PID ]]; do
             echo $a >&3
-            read a <&8
+            if [[ -e /proc/$AI2_PID ]]; then
+                read a <&8
+            fi
         done
         echo $a >&3
         sleep $S
     done
 elif [[ $H2 -eq 1 ]]; then
-    while kill -0 $AI1_PID 2> /dev/null; do
+    while [[ -e /proc/$AI1_PID ]]; do
         read a <&6
-        while [[ ! $a == "END_TURN" ]]; do
-            read a <&6
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI1_PID ]]; do
             echo $a >&3
+            if [[ -e /proc/$AI1_PID ]]; then
+                read a <&6
+            fi
         done
         echo $a >&3
 
         read a <&4
-        while [[ ! $a == "END_TURN" ]]; do
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$PROGRAM_PID ]]; do
             echo $a >&5
-            echo $a >&3
-            read a <&4
+            if [[ -e /proc/$AI1_PID ]]; then
+                read a <&4
+            fi
         done
-        echo $a >&3
         echo $a >&5
         sleep $S
     done
 else
-    while kill -0 $AI1_PID 2> /dev/null; do
+    while [[ -e /proc/$AI1_PID ]] && [[ -e /proc/$AI2_PID ]]; do
         read a <&6
-        while [[ ! $a == "END_TURN" ]]; do
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI1_PID ]]; do
             echo $a >&3
             echo $a >&7
-            read a <&6
+            if [[ -e /proc/$AI1_PID ]]; then
+                read a <&6
+            fi
         done
         echo $a >&3
         echo $a >&7
         sleep $S
 
         read a <&8
-        while [[ ! $a == "END_TURN" ]]; do
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI2_PID ]]; do
             echo $a >&3
             echo $a >&5
-            read a <&8
+            if [[ -e /proc/$AI2_PID ]]; then
+                read a <&8
+            fi
         done
         echo $a >&3
         echo $a >&5
@@ -203,9 +211,9 @@ if kill -0 $PROGRAM_PID 2> /dev/null; then
 fi
 
 if kill -0 $AI1_PID 2> /dev/null; then
-    kill AI1_PID
+    kill $AI1_PID
 fi
 
 if kill -0 $AI2_PID 2> /dev/null; then
-    kill AI2_PID
+    kill $AI2_PID
 fi
