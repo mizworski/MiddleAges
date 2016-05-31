@@ -23,6 +23,7 @@ int main() {
     bool gameOver = false; ///<  Variable that indicate whether to terminate loop.
     int currentPlayer = 1;
     int myNumber = 0;
+    int playerWon = ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE;
 
     startGame();
 
@@ -64,8 +65,10 @@ int main() {
                 returnValue = ERROR;
         }
 
-        if (currentPlayer == myNumber) {
+        if (currentPlayer == myNumber && returnValue != EXCEEDED_ROUND_LIMIT) {
             makeMoves();
+            returnValue = endTurn();
+            changePlayer(&currentPlayer);
         }
 
         free(newCommand); ///< Freeing command after passing it to engine.
@@ -84,23 +87,35 @@ int main() {
 
         if (returnValue == DRAW || returnValue == EXCEEDED_ROUND_LIMIT) {
             gameOver = true;
-            fprintf(stderr,
-                    DRAW_MESSAGE);
+//            fprintf(stderr,
+//                    DRAW_MESSAGE);
+            playerWon = 0;
         }
 
         if (returnValue == PLAYER_A_WON) {
             gameOver = true;
-            fprintf(stderr,
-                    PLAYER_A_WON_MESSAGE);
+//            fprintf(stderr,
+//                    PLAYER_A_WON_MESSAGE);
+            playerWon = 1;
         }
         if (returnValue == PLAYER_B_WON) {
             gameOver = true;
-            fprintf(stderr,
-                    PLAYER_B_WON_MESSAGE);
+//            fprintf(stderr,
+//                    PLAYER_B_WON_MESSAGE);
+            playerWon = 2;
         }
     }
 
     endGame();
 
-    return 0;
+
+    if (playerWon == 1 || playerWon == 2) {
+        return myNumber == playerWon ? 0 : 2;
+    }
+
+    if (playerWon == 0) {
+        return 1;
+    }
+
+    return ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE;
 }
