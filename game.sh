@@ -168,7 +168,9 @@ elif [[ $H2 -eq 1 ]]; then
         done
         echo $a >&3
 
-        read a <&4
+        if [[ -e /proc/$AI1_PID ]]; then
+            read a <&4
+        fi
         while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$PROGRAM_PID ]]; do
             echo $a >&5
             if [[ -e /proc/$AI1_PID ]]; then
