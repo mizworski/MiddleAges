@@ -55,24 +55,124 @@ case ${key} in
     shift
     ;;
     *)
-            # unknown option
+        exit 1        # unknown option
     ;;
 esac
 shift # past argument or value
 done
 
-if [ $X1 -eq 0 ] && [ X2 -eq 0 ]; then
-    X1=$[ ( $RANDOM % N )  + 1 ]
-    Y1=$[ ( $RANDOM % (N - 3) )  + 1 ]
-    X2=$[ X1 + 8 + ( $RANDOM % (N - 8) ) ]
-    Y2=$[ ( $RANDOM % (N - 3) )  + 1 ]
-elif [ $X1 -eq 0 ]; then
-    X1=$[ X2 + 8 + ( $RANDOM % (N - 8) ) ]
-    Y1=$[ ( $RANDOM % (N - 3) )  + 1 ]
-elif [ $X2 -eq 0 ]; then
-    X2=$[ X1 + 8 + ( $RANDOM % (N - 8) ) ]
-    Y2=$[ ( $RANDOM % (N - 3) )  + 1 ]
+
+
+if [ ! $X1 -eq 0 ] && [ ! $X2 -eq 0 ]; then
+    if [  $X1 - $X2  -lt 8 ] && [  $X2 - $X1  -lt 8 ]; then
+        if [ $Y1 - $Y2 -lt 8 ] && [ $Y2 - $Y1 -lt 8 ]; then
+            exit 1
+        fi
+    fi
+elif [ ! $X1 -eq 0 ]; then
+    if [ $N - $X1 -lt 8 ] && [ $X1 -lt 9 ] && [ $N - $Y1 -lt 8 ] && [ $Y1 -lt 9 ]; then
+        exit 1
+    fi
+elif [ ! $X2 -eq 0 ]; then
+    if [ $N - $X2 -lt 8 ] && [ $X2 -lt 9 ] && [ $N - $Y2 -lt 8 ] && [ $Y2 -lt 9 ]; then
+        exit 1
+    fi
 fi
+
+#if [ $X1 -eq 0 ] && [ $X2 -eq 0 ]; then
+#    X1=$[ ( $RANDOM % $N )  + 1 ]
+#    Y1=$[ ( $RANDOM % ($N - 3) )  + 1 ]
+#    X2=$[ $X1 + 8 + ( $RANDOM % ($N - 8) ) ]
+#    Y2=$[ ( $RANDOM % ($N - 3) )  + 1 ]
+#elif [ $X1 -eq 0 ]; then
+#    X1=$[ $X2 + 8 + ( $RANDOM % ($N - 8) ) ]
+#    Y1=$[ ( $RANDOM % ($N - 3) )  + 1 ]
+#elif [ $X2 -eq 0 ]; then
+#    X2=$[ $X1 + 8 + ( $RANDOM % ($N - 8) ) ]
+#    Y2=$[ ( $RANDOM % ($N - 3) )  + 1 ]
+#fi
+
+if [ $X1 -eq 0 ] && [ $X2 -eq 0 ]; then
+    A=$[ $RANDOM % 2 ]
+    B=$[ $RANDOM % 2 ]
+    C=$[ $RANDOM % 2 ]
+#    D1=$[ 1 + ( $RANDOM % $N ) ]
+#    D2=$[ 8 + ( $RANDOM % ($N - 8) ) ]
+    if [ "$A" -eq 0 ] && [ "$N" -gt 11 ]; then
+        D1=$[ 8 + ( $RANDOM % ( $N - ( 11 ) ) ) ]
+        D2=$[ 1 + ( $RANDOM % $N ) ]
+    else
+        D1=$[ 1 + ( $RANDOM % ( $N - 4 ) ) ]
+        D2=$[ 8 + ( $RANDOM % ( $N - 8 ) ) ]
+    fi
+    P1=$[ 1 + ( $RANDOM % ( $N - ( $D1 + 3 ) ) ) ]
+    P2=$[ $P1 + $D1 ]
+    Q1=$[ 1 + ( $RANDOM % ( $N - $D2 ) ) ]
+    Q2=$[ $Q1 + $D2 ]
+
+    if [ "$B" -eq 0 ] && [ "$C" -eq 0 ]; then
+        X1=$P1
+        X2=$P2
+        Y1=$Q1
+        Y2=$Q2
+    fi
+    if [ "$B" -eq 1 ] && [ "$C" -eq 0 ]; then
+        X1=$P2
+        X2=$P1
+        Y1=$Q1
+        Y2=$Q2
+    fi
+    if [ "$B" -eq 0 ] && [ "$C" -eq 1 ]; then
+        X1=$P1
+        X2=$P2
+        Y1=$Q2
+        Y2=$Q1
+    fi
+    if [ "$B" -eq 1 ] && [ "$C" -eq 1 ]; then
+        X1=$P2
+        X2=$P1
+        Y1=$Q2
+        Y2=$Q1
+    fi
+fi
+
+#if [ $X1 -eq 0 ]; then
+#    if [[ $X2 -gt 8 ]] || [[ $X2 -le $N - 11 ]]; then
+#        if [[ $Y2 -gt 8 ]] || [[ $Y2 -le $N - 8 ]]; then
+#            A=$[ $RANDOM % 2 ]
+#            if [[ $A -eq 0 ]]; then
+#
+#if [ $X1 -eq 0 ]; then
+#    if [[ $X2 -gt 8 ]]; then
+#        if [[ $X2 -le $N - 11 ]]; then
+#            if [[ $Y2 -gt 8 ]]; then
+#                if [[ $Y2 -le $N - 8 ]]; then
+#                    A=$[ $RANDOM % 2 ]
+#                    if [[ $A -eq 0 ]]; then
+#                        B=$[ 1 + $RANDOM % ( $N - (17 + 3) ) ]
+#                        if [[ $B -le $X2 - 8 ]]; then
+#                            X1=$B
+#                        else
+#                            X1=$[ $B + 15 ]
+#                        fi
+#                        Y1=$[ 1 + $RANDOM % N ]
+#                    else #A -eq 1
+#                        B=$[ 1 + $RANDOM % ( $N - 17 ) ]
+#                        if [[ $B -le $Y2 - 8 ]]; then
+#                            Y1=$B
+#                        else
+#                            Y1=$[ $B + 15 ]
+#                        fi
+#                        X1=$[ 1 + $RANDOM % (N - 3) ]
+#                    fi
+
+
+
+
+
+
+
+
 
 PIPE=$(mktemp -u)
 mkfifo $PIPE
@@ -138,72 +238,110 @@ if [[ $H1 -eq 1 ]] && [[ $H2 -eq 1 ]]; then
     done
 elif [[ $H1 -eq 1 ]]; then
     while [[ -e /proc/$AI2_PID ]]; do
-        read a <&4
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$PROGRAM_PID ]]; do
-            echo $a >&7
-            if [[ -e /proc/$AI2_PID ]]; then
-                read a <&4
+        read -t 1 a <&4
+        while [[ ! $a == "END_TURN" ]] && [[ ! $a == "" ]]; do
+            if [[ ! $a == "" ]]; then
+                echo $a >&7
+            fi
+#            if [[ -e /proc/$AI2_PID ]]; then
+            if [[ ! $a == "" ]]; then
+                read -t 1 a <&4
             fi
         done
-        echo $a >&7
+        if [[ ! $a == "" ]]; then
+                echo $a >&7
+        fi
 
-        read a <&8
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI2_PID ]]; do
-            echo $a >&3
-            if [[ -e /proc/$AI2_PID ]]; then
-                read a <&8
+        read -t 1 a <&8
+        while [[ ! $a == "END_TURN" ]] && [[ ! $a == "" ]]; do
+            if [[ ! $a == "" ]]; then
+                echo $a >&3
+            fi
+#            if [[ -e /proc/$AI2_PID ]]; then
+            if [[ ! $a == "" ]]; then
+                read -t 1 a <&8
             fi
         done
-        echo $a >&3
+        if [[ ! $a == "" ]]; then
+                echo $a >&3
+        fi
         sleep $S
     done
 elif [[ $H2 -eq 1 ]]; then
     while [[ -e /proc/$AI1_PID ]]; do
-        read a <&6
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI1_PID ]]; do
-            echo $a >&3
-            if [[ -e /proc/$AI1_PID ]]; then
-                read a <&6
+        read -t 1 a <&6
+        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI1_PID ]] && [[ ! $a == "" ]]; do
+            if [[ ! $a == "" ]]; then
+                echo $a >&3
+            fi
+#            if [[ -e /proc/$AI1_PID ]]; then
+            if [[ ! $a == "" ]]; then
+                read -t 1 a <&6
             fi
         done
-        echo $a >&3
-
-        if [[ -e /proc/$AI1_PID ]]; then
-            read a <&4
+        if [[ ! $a == "" ]]; then
+                echo $a >&3
         fi
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$PROGRAM_PID ]]; do
-            echo $a >&5
-            if [[ -e /proc/$AI1_PID ]]; then
-                read a <&4
+
+
+#        if [[ -e /proc/$AI1_PID ]]; then
+            read -t 1 a <&4
+#        fi
+        while [[ ! $a == "END_TURN" ]]  && [[ ! $a == "" ]]; do
+            if [[ ! $a == "" ]]; then
+                echo $a >&5
+            fi
+#            if [[ -e /proc/$AI1_PID ]]; then
+            if [[ ! $a == "" ]]; then
+                read -t 1 a <&4
             fi
         done
-        echo $a >&5
+        if [[ ! $a == "" ]]; then
+                echo $a >&5
+        fi
         sleep $S
     done
 else
-    while [[ -e /proc/$AI1_PID ]] && [[ -e /proc/$AI2_PID ]]; do
-        read a <&6
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI1_PID ]]; do
-            echo $a >&3
-            echo $a >&7
-            if [[ -e /proc/$AI1_PID ]]; then
-                read a <&6
-            fi
+#    while kill -0 $AI1_PID 2> /dev/null || kill -0 $AI2_PID 2> /dev/null; do
+    while kill -0 $PROGRAM_PID 2> /dev/null; do
+        read -t 1 a <&6
+        while [[ ! $a == "END_TURN" ]] && [[ ! $a == "" ]]; do
+           if [[ ! $a == "" ]]; then
+                echo $a >&3
+                echo $a >&7
+           fi
+#           if [[ -e /proc/$AI1_PID ]]; then
+           if [[ ! $a == "" ]]; then
+                read -t 1 a <&6
+           fi
         done
-        echo $a >&3
-        echo $a >&7
+        if [[ ! $a == "" ]]; then
+                echo $a >&3
+                echo $a >&7
+        fi
         sleep $S
 
-        read a <&8
-        while [[ ! $a == "END_TURN" ]] && [[ -e /proc/$AI2_PID ]]; do
-            echo $a >&3
-            echo $a >&5
-            if [[ -e /proc/$AI2_PID ]]; then
-                read a <&8
+#        if [[ -e /proc/$AI2_PID ]]; then
+#        if [[ ! $a == "" ]]; then
+        read -t 1 b <&8
+#        fi
+        while [[ ! $b == "END_TURN" ]]  && [[ ! $b == "" ]]; do
+            if [[ ! $b == "" ]]; then
+                echo $b >&3
+                echo $b >&5
+            fi
+            #if [[ -e /proc/$AI2_PID ]]; then
+            if [[ ! $b == "" ]]; then
+                read -t 1 b <&8
             fi
         done
-        echo $a >&3
-        echo $a >&5
+        if [[ ! $b == "" ]]; then
+                echo $b >&3
+                echo $b >&5
+        fi
+#        if kill -0 $AI2_PID 2> /dev/null; then
+#            echo jeszcze zyje
+#        fi
         sleep $S
     done
 fi

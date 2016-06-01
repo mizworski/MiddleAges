@@ -476,6 +476,6 @@ static int getPawnAdherence(pawn *currentPawn) {
 }
 
 void makeMoves() {
-    fprintf(stdout,
-            "END_TURN\n");
+    printf("END_TURN\n");
+    fflush(stdout);
 }

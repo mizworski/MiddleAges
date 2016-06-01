@@ -69,7 +69,8 @@ int main() {
             returnValue != EXCEEDED_ROUND_LIMIT &&
             returnValue != DRAW &&
             returnValue != PLAYER_A_WON &&
-            returnValue != PLAYER_B_WON) {
+            returnValue != PLAYER_B_WON &&
+            returnValue != ERROR) {
             makeMoves();
             returnValue = endTurn();
             changePlayer(&currentPlayer);
@@ -79,8 +80,8 @@ int main() {
 
         if (returnValue == ERROR) {
             endGame();
-            fprintf(stderr,
-                    INPUT_ERROR_MESSAGE);
+//            fprintf(stderr,
+//                    INPUT_ERROR_MESSAGE);
             return ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE;
         }
 /*
