@@ -17,31 +17,80 @@ H2=1
 AI1=""
 AI2=""
 
-while [[ $# > 1 ]]
+while [[ $# > 0 ]]
 do
 key="$1"
 
 case ${key} in
     -n)
     N="$2"
+    if [[ ! $N =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+    if [[ $N -ge 2147483648 ]] || [[ $N -le 8 ]]; then
+        exit 1
+    fi
     shift
     ;;
     -k)
     K="$2"
+    if [[ ! $K =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+    if [[ $N -ge 2147483648 ]] || [[ $N -lt 1 ]]; then
+        exit 1
+    fi
     shift
     ;;
     -s)
     S="$2"
+    if [[ ! $S =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
     shift
     ;;
     -p1)
     X1=${2%,*}
     Y1=${2#*,}
+    if [[ ! $X1 =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+    if [[ ! $Y1 =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+
+    if [[ $X1 -ge 2147483645 ]] || [[ $X1 -lt 1 ]]; then
+        exit 1
+    fi
+    if [[ $Y1 -ge 2147483648 ]] || [[ $Y1 -lt 1 ]]; then
+        exit 1
+    fi
+
+    if [[ X1 -eq 0 ]] || [[ Y1 -eq 0 ]]; then
+        exit 1
+    fi
     shift
     ;;
     -p2)
     X2=${2%,*}
     Y2=${2#*,}
+    if [[ ! $X2 =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+    if [[ ! $Y2 =~ ^-?[0-9]+$ ]]; then
+        exit 1
+    fi
+
+    if [[ $X2 -ge 2147483645 ]] || [[ $X2 -lt 1 ]]; then
+        exit 1
+    fi
+    if [[ $Y2 -ge 2147483648 ]] || [[ $Y2 -lt 1 ]]; then
+        exit 1
+    fi
+
+    if [[ X2 -eq 0 ]] || [[ Y2 -eq 0 ]]; then
+        exit 1
+    fi
     shift
     ;;
     -ai1)
@@ -63,18 +112,18 @@ done
 
 
 
-if [ ! $X1 -eq 0 ] && [ ! $X2 -eq 0 ]; then
-    if [  $X1 - $X2  -lt 8 ] && [  $X2 - $X1  -lt 8 ]; then
-        if [ $Y1 - $Y2 -lt 8 ] && [ $Y2 - $Y1 -lt 8 ]; then
+if [[ ! X1 -eq 0 ]] && [[ ! X2 -eq 0 ]]; then
+    if [  $(($X1-$X2)) -lt 8 ] && [ $(($X2-$X1)) -lt 8 ]; then
+        if [ $(($Y1-$Y2)) -lt 8 ] && [ $(($Y2-$Y1)) -lt 8 ]; then
             exit 1
         fi
     fi
-elif [ ! $X1 -eq 0 ]; then
-    if [ $N - $X1 -lt 8 ] && [ $X1 -lt 9 ] && [ $N - $Y1 -lt 8 ] && [ $Y1 -lt 9 ]; then
+elif [[ ! X1 -eq 0 ]]; then
+    if [ $(($N-$X1)) -lt 8 ] && [[ X1 -lt 9 ]] && [ $(($N-$Y1)) -lt 8 ] && [[ Y1 -lt 9 ]]; then
         exit 1
     fi
-elif [ ! $X2 -eq 0 ]; then
-    if [ $N - $X2 -lt 8 ] && [ $X2 -lt 9 ] && [ $N - $Y2 -lt 8 ] && [ $Y2 -lt 9 ]; then
+elif [[ ! X2 -eq 0 ]]; then
+    if [ $(($N-$X2)) -lt 8 ] && [[ X2 -lt 9 ]] && [ $(($N-$Y2 -lt)) 8 ] && [[ Y2 -lt 9 ]]; then
         exit 1
     fi
 fi
@@ -133,6 +182,170 @@ if [ $X1 -eq 0 ] && [ $X2 -eq 0 ]; then
         X2=$P1
         Y1=$Q2
         Y2=$Q1
+    fi
+fi
+
+if [ $X1 -eq 0 ]; then
+    UP=$Y2
+    DOWN=$[$N-$Y2]
+    LEFT=$X2
+    RIGHT=$[$N-$X2]
+    COUNT=0
+
+    if [[ UP -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ DOWN -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ LEFT -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ RIGHT -gt 11 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+
+    if [[ COUNT -eq 0 ]]; then
+        exit 1
+    fi
+
+    A=$[ $RANDOM % COUNT ]
+
+    if [[ UP -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=0
+        DIST=$[$UP-8]
+    fi
+    if [[ A -eq -1 ]] || [[ DOWN -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=1
+        DIST=$[$DOWN-8]
+    fi
+    if [[ A -eq -1 ]] || [[ LEFT -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=2
+        DIST=$[$LEFT-8]
+    fi
+    if [[ A -eq -1 ]] || [[ RIGHT -gt 11 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=3
+        DIST=$[$RIGHT-11]
+    fi
+
+    C=$[ $RANDOM % DIST ]
+
+    if [[ B -eq 0 ]]; then
+        Y1=$[ 1 + $C ]
+        X1=$[ 1 + $RANDOM % $[$N - 3] ]
+    fi
+
+    if [[ B -eq 1 ]]; then
+        Y1=$[ $N - $C ]
+        X1=$[ 1 + $RANDOM % $[$N - 3] ]
+    fi
+
+    if [[ B -eq 2 ]]; then
+        X1=$[ 1 + $C ]
+        Y1=$[ 1 + $RANDOM % $N ]
+    fi
+
+    if [[ B -eq 3 ]]; then
+        X1=$[ $N - $[$C + 3] ]
+        Y1=$[ 1 + $RANDOM % $N ]
+    fi
+fi
+
+if [ $X2 -eq 0 ]; then
+    UP=$Y1
+    DOWN=$[$N-$Y1]
+    LEFT=$X1
+    RIGHT=$[$N-$X1]
+    COUNT=0
+
+    if [[ UP -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ DOWN -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ LEFT -gt 8 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+    if [[ RIGHT -gt 11 ]]; then
+        COUNT=$(( $COUNT + 1 ))
+    fi
+
+
+    if [[ COUNT -eq 0 ]]; then
+        exit 1
+    fi
+
+    A=$[ $RANDOM % COUNT ]
+
+    if [[ UP -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=0
+        DIST=$[$UP-8]
+    fi
+    if [[ A -eq -1 ]] || [[ DOWN -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=1
+        DIST=$[$DOWN-8]
+    fi
+    if [[ A -eq -1 ]] || [[ LEFT -gt 8 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=2
+        DIST=$[$LEFT-8]
+    fi
+    if [[ A -eq -1 ]] || [[ RIGHT -gt 11 ]]; then
+        A=$(( $A - 1 ))
+    fi
+    if [[ A -eq -1 ]]; then
+        B=3
+        DIST=$[$RIGHT-11]
+    fi
+
+    C=$[ $RANDOM % DIST ]
+
+    if [[ B -eq 0 ]]; then
+        Y2=$[ 1 + $C ]
+        X2=$[ 1 + $RANDOM % $[$N - 3] ]
+    fi
+
+    if [[ B -eq 1 ]]; then
+        Y2=$[ $N - $C ]
+        X2=$[ 1 + $RANDOM % $[$N - 3] ]
+    fi
+
+    if [[ B -eq 2 ]]; then
+        X2=$[ 1 + $C ]
+        Y2=$[ 1 + $RANDOM % $N ]
+    fi
+
+    if [[ B -eq 3 ]]; then
+        X2=$[ $N - $[$C + 3] ]
+        Y2=$[ 1 + $RANDOM % $N ]
     fi
 fi
 
@@ -305,6 +518,14 @@ else
 #    while kill -0 $AI1_PID 2> /dev/null || kill -0 $AI2_PID 2> /dev/null; do
     while kill -0 $PROGRAM_PID 2> /dev/null; do
         read -t 1 a <&6
+#        if [[ $a == "GOD_MODE_ON" ]]; then
+#                echo $a >&3
+#                echo $a >&7
+#                kill $PROGRAM_PID
+#                kill $AI1_PID
+#                kill $AI2_PID
+#                exit 1
+#        fi # XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
         while [[ ! $a == "END_TURN" ]] && [[ ! $a == "" ]]; do
            if [[ ! $a == "" ]]; then
                 echo $a >&3
@@ -319,6 +540,7 @@ else
                 echo $a >&3
                 echo $a >&7
         fi
+
         sleep $S
 
 #        if [[ -e /proc/$AI2_PID ]]; then
@@ -349,11 +571,34 @@ fi
 if kill -0 $PROGRAM_PID 2> /dev/null; then
     kill $PROGRAM_PID
 fi
+wait -n $PROGRAM_PID
+PROGRAM_RET=$?
 
 if kill -0 $AI1_PID 2> /dev/null; then
     kill $AI1_PID
 fi
 
+if [[ H1 -eq 0 ]]; then
+    wait -n $AI1_PID
+    AI1_RET=$?
+fi
+
 if kill -0 $AI2_PID 2> /dev/null; then
     kill $AI2_PID
+fi
+if [[ H2 -eq 0 ]]; then
+    wait -n $AI2_PID
+    AI2_RET=$?
+fi
+
+if [[ ! PROGRAM_RET -eq 0 ]]; then
+    exit 1
+fi
+
+if [[ H1 -eq 0 ]] && [[ ! AI1_RET -eq 0 ]] && [[ ! AI1_RET -eq 1 ]] && [[ ! AI1_RET -eq 2 ]]; then
+    exit 1
+fi
+
+if [[ H2 -eq 0 ]] && [[ ! AI2_RET -eq 0 ]] && [[ ! AI2_RET -eq 1 ]] && [[ ! AI2_RET -eq 2 ]]; then
+    exit 1
 fi
