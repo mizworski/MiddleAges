@@ -5,11 +5,11 @@ project(middle_ages C)
 option (DEBUG OFF)
 
 # jeśli DEBUG == ON, ustawiamy zmienną specyfikującą typ kompilacji na wartość DEBUG, wpp. na release
-#if (DEBUG)
-#    set(CMAKE_BUILD_TYPE DEBUG)
-#else (DEBUG)
-#    set(CMAKE_BUILD_TYPE RELEASE)
-#endif (DEBUG)
+if (DEBUG)
+    set(CMAKE_BUILD_TYPE DEBUG)
+else (DEBUG)
+    set(CMAKE_BUILD_TYPE RELEASE)
+endif (DEBUG)
 
 # ustawiamy flagi kompilacji w wersji debug i release
 set(CMAKE_C_FLAGS_DEBUG "-std=gnu99 -Wall -pedantic -g")
