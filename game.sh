@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # some arguments don't have a corresponding value to go with it such
 # as in the --default example).
