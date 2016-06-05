@@ -37,7 +37,7 @@ case ${key} in
     if [[ ! $K =~ ^-?[0-9]+$ ]]; then
         exit 1
     fi
-    if [[ $N -ge 2147483648 ]] || [[ $N -lt 1 ]]; then
+    if [[ $K -ge 2147483648 ]] || [[ $K -lt 1 ]]; then
         exit 1
     fi
     shift
@@ -427,7 +427,7 @@ else
     $PROGRAM <&3 >&4 &
 fi
 
-PROGRAM_PID=$!
+GUI_PID=$!
 
 if [[ H1 -eq 0 ]]
 then
@@ -446,7 +446,7 @@ echo INIT ${N} ${K} 2 ${X1} ${Y1} ${X2} ${Y2} >&3
 echo INIT ${N} ${K} 2 ${X1} ${Y1} ${X2} ${Y2} >&7
 
 if [[ $H1 -eq 1 ]] && [[ $H2 -eq 1 ]]; then
-    while kill -0 $PROGRAM_PID 2> /dev/null; do
+    while kill -0 $GUI_PID 2> /dev/null; do
         :
     done
 elif [[ $H1 -eq 1 ]]; then
@@ -516,12 +516,13 @@ elif [[ $H2 -eq 1 ]]; then
     done
 else
 #    while kill -0 $AI1_PID 2> /dev/null || kill -0 $AI2_PID 2> /dev/null; do
-    while kill -0 $PROGRAM_PID 2> /dev/null; do
+    while kill -0 $GUI_PID 2> /dev/null; do
+    if kill -0 $AI2_PID 2> /dev/null && kill -0 $GUI_PID 2> /dev/null; then
         read -t 1 a <&6
 #        if [[ $a == "GOD_MODE_ON" ]]; then
 #                echo $a >&3
 #                echo $a >&7
-#                kill $PROGRAM_PID
+#                kill $GUI_PID
 #                kill $AI1_PID
 #                kill $AI2_PID
 #                exit 1
@@ -542,9 +543,10 @@ else
         fi
 
         sleep $S
-
+    fi
 #        if [[ -e /proc/$AI2_PID ]]; then
 #        if [[ ! $a == "" ]]; then
+    if kill -0 $AI1_PID 2> /dev/null && kill -0 $GUI_PID 2> /dev/null; then
         read -t 1 b <&8
 #        fi
         while [[ ! $b == "END_TURN" ]]  && [[ ! $b == "" ]]; do
@@ -565,13 +567,14 @@ else
 #            echo jeszcze zyje
 #        fi
         sleep $S
+    fi
     done
 fi
 
-if kill -0 $PROGRAM_PID 2> /dev/null; then
-    kill $PROGRAM_PID
+if kill -0 $GUI_PID 2> /dev/null; then
+    kill $GUI_PID
 fi
-wait -n $PROGRAM_PID
+wait -n $GUI_PID
 PROGRAM_RET=$?
 
 if kill -0 $AI1_PID 2> /dev/null; then
